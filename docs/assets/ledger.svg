@@ -1,0 +1,3 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 400" width="820" height="400" role="img" aria-labelledby="ledger-title ledger-desc" font-family="'Iosevka','SFMono-Regular',Consolas,monospace">
+  <title id="ledger-title">Cairn performance ledger: a cache MISS then HIT</title>
+  <desc id="ledger-desc">A terminal window showing a first run that misses the cache and executes the command, followed by a second run that hits the cache and restores outputs. A ledger records the two events.</desc>
