@@ -4,3 +4,6 @@
 
   <defs>
     <linearGradient id="term" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b2f34"/>
+      <stop offset="1" stop-color="#1f2226"/>
+    </linearGradient>
