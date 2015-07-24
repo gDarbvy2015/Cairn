@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 420" width="880" height="420" role="img" aria-labelledby="strata-title strata-desc" font-family="'Iosevka','SFMono-Regular',Consolas,monospace">
+  <title id="strata-title">Cairn: artifacts descending into content-addressed strata</title>
+  <desc id="strata-desc">A cross-section of rock layers. Build artifacts fall from the surface and settle into content-addressed strata, each labelled with an FNV-1a digest shard.</desc>
+
