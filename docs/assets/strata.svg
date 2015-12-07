@@ -2,3 +2,8 @@
   <title id="strata-title">Cairn: artifacts descending into content-addressed strata</title>
   <desc id="strata-desc">A cross-section of rock layers. Build artifacts fall from the surface and settle into content-addressed strata, each labelled with an FNV-1a digest shard.</desc>
 
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e8f1f5"/>
+      <stop offset="1" stop-color="#cfe1e8"/>
+    </linearGradient>
