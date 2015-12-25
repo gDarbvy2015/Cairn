@@ -18,3 +18,10 @@ func TestKnownVectors(t *testing.T) {
 		if got := HashBytes([]byte(input)); got != want {
 			t.Errorf("HashBytes(%q) = %s, want %s", input, got, want)
 		}
+	}
+}
+
+func TestStreamingMatchesOneShot(t *testing.T) {
+	h := NewHasher()
+	h.Update([]byte("foo"))
+	h.Update([]byte("bar"))
