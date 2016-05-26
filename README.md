@@ -59,3 +59,23 @@ exist, but they are islands — Cargo does not know what `make` did, `go build`
 does not know what your bundler did, and none share a cache with the shell
 script gluing the pipeline together.
 
+Cairn takes the opposite position. It treats a build step as an opaque
+function — *declared inputs, a command, declared outputs* — and memoizes it by
+content. If the inputs and the command hash to a key seen before, the recorded
+outputs are laid back down verbatim and the command never runs. Because the key
+is derived purely from bytes, a step cached by the Go wrapper is a legitimate
+hit for the Rust engine, and the reverse — the common ground a polyglot pipeline
+never otherwise had. It is deliberately a *small* idea executed carefully: Cairn
+does not schedule, resolve dependency graphs, or discover inputs. You declare
+them; it remembers them.
+
+## Why two languages share one seam
+
+A cache is only worth trusting if every tool that touches it computes the same
+key and reads the same bytes. The two-language design exists to *prove* that
+rather than assert it: the Go surveyor writes a manifest, the Rust engine
+restores and verifies it, their keys match byte-for-byte, and the test suites
+carry cross-language reference vectors so any drift fails CI immediately. The
+contract that binds them is [`docs/FORMAT.md`](docs/FORMAT.md) — the normative
+specification. This README is the field guide *to* that contract.
+
