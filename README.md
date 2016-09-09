@@ -18,3 +18,23 @@ written in; it cares only about *bytes in* and *bytes out*.
 
 The system is quarried from two tools that agree, seam for seam, on one format:
 
+| Tool         | Language | Role in the section                                          |
+| ------------ | -------- | ------------------------------------------------------------ |
+| `cairn`      | Rust     | The engine — hashes, stores, restores, and *verifies* rock.  |
+| `cairn-run`  | Go       | The surveyor — wraps any command; on a hit restores, not run.|
+
+Both are built on standard libraries only — no third-party crates, no Go
+modules beyond the toolchain. The content address is a **deterministic,
+non-cryptographic FNV-1a** digest; that caveat is not a footnote — it is
+load-bearing, and it is stated plainly throughout.
+
+---
+
+## Core sample (table of contents)
+
+- [Surface reading — the problem](#surface-reading--the-problem)
+- [Why two languages share one seam](#why-two-languages-share-one-seam)
+- [Field kit — install &amp; build](#field-kit--install--build)
+- [First descent — quickstart transcripts](#first-descent--quickstart-transcripts)
+- [The three strata: MISS → STORE → HIT](#the-three-strata-miss--store--hit)
+- [Reading the rock — data layout on disk](#reading-the-rock--data-layout-on-disk)
