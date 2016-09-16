@@ -38,3 +38,24 @@ load-bearing, and it is stated plainly throughout.
 - [First descent — quickstart transcripts](#first-descent--quickstart-transcripts)
 - [The three strata: MISS → STORE → HIT](#the-three-strata-miss--store--hit)
 - [Reading the rock — data layout on disk](#reading-the-rock--data-layout-on-disk)
+- [Cache-key anatomy](#cache-key-anatomy)
+- [Rust ↔ Go interop](#rust--go-interop)
+- [Guided walk — the scripted demo](#guided-walk--the-scripted-demo)
+- [The performance ledger](#the-performance-ledger)
+- [Field hazards — failure modes](#field-hazards--failure-modes)
+- [Known limits of the survey](#known-limits-of-the-survey)
+- [Integration recipes](#integration-recipes)
+- [Command reference](#command-reference)
+- [Roadmap — unexplored seams](#roadmap--unexplored-seams)
+- [License](#license)
+
+---
+
+## Surface reading — the problem
+
+Every build system re-does work it has already done: change one comment and the
+toolchain recompiles a hundred files that did not move. Language-native caches
+exist, but they are islands — Cargo does not know what `make` did, `go build`
+does not know what your bundler did, and none share a cache with the shell
+script gluing the pipeline together.
+
