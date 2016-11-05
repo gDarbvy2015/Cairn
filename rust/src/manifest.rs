@@ -13,3 +13,18 @@ use crate::json::{self, Json};
 /// Current manifest format version. Bump on incompatible changes.
 pub const FORMAT_VERSION: u64 = 1;
 
+/// A single hashed input file.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InputEntry {
+    /// Logical path (as supplied on the command line), using forward slashes.
+    pub path: String,
+    /// Content digest (canonical 16-char hex).
+    pub digest: String,
+    /// Size in bytes.
+    pub size: u64,
+}
+
+/// A single captured output file.
+#[derive(Clone, Debug, PartialEq)]
+pub struct OutputEntry {
+    /// Logical path, using forward slashes.
