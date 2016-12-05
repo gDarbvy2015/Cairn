@@ -9,3 +9,15 @@
 // Usage:
 //
 //	cairn-run [options] -- <command> [args...]
+//
+// Options:
+//
+//	--cache-dir DIR   cache root (default .cairn-cache)
+//	--base-dir  DIR   base directory for inputs/outputs (default .)
+//	--input     F     declare an input file (repeatable)
+//	--output    F     declare an output file (repeatable)
+//	--force           always run; still records the manifest
+//	--verbose         print cache decisions
+//
+// Standalone subcommands (no `--`):
+//
