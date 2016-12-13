@@ -6,3 +6,6 @@
 $ErrorActionPreference = 'Stop'
 
 $here  = Split-Path -Parent $PSScriptRoot
+$cairn = Join-Path $here 'rust\target\release\cairn.exe'
+$run   = Join-Path $here 'bin\cairn-run.exe'
+
