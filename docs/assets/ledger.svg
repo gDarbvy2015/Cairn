@@ -11,3 +11,6 @@
       .chrome{ fill:#3f4349; }
       .txt   { fill:#e6eaef; font-size:13px; }
       .dim   { fill:#8b9099; font-size:13px; }
+      .amber { fill:#d9a441; font-size:13px; }
+      .ice   { fill:#8fd0e8; font-size:13px; }
+      .miss  { fill:#e0975a; font-size:13px; font-weight:bold; }
