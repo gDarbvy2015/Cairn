@@ -20,3 +20,26 @@ pub enum Json {
     /// Ordered map so serialization is deterministic.
     Object(Vec<(String, Json)>),
 }
+
+impl Json {
+    /// Serialize to canonical, compact JSON (no extra whitespace).
+    pub fn encode(&self) -> String {
+        let mut out = String::new();
+        self.write_to(&mut out);
+        out
+    }
+
+    fn write_to(&self, out: &mut String) {
+        match self {
+            Json::Str(s) => write_json_string(s, out),
+            Json::Uint(n) => {
+                let _ = write!(out, "{n}");
+            }
+            Json::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
+            Json::Array(items) => {
+                out.push('[');
+                for (i, item) in items.iter().enumerate() {
+                    if i > 0 {
+                        out.push(',');
+                    }
+                    item.write_to(out);
