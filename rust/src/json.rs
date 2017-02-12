@@ -43,3 +43,26 @@ impl Json {
                         out.push(',');
                     }
                     item.write_to(out);
+                }
+                out.push(']');
+            }
+            Json::Object(entries) => {
+                out.push('{');
+                for (i, (k, v)) in entries.iter().enumerate() {
+                    if i > 0 {
+                        out.push(',');
+                    }
+                    write_json_string(k, out);
+                    out.push(':');
+                    v.write_to(out);
+                }
+                out.push('}');
+            }
+        }
+    }
+
+    /// Borrow this value as an object's entries, if it is an object.
+    pub fn as_object(&self) -> Option<&[(String, Json)]> {
+        match self {
+            Json::Object(e) => Some(e),
+            _ => None,
