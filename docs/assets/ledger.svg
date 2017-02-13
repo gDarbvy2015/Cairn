@@ -17,3 +17,6 @@
       .hit   { fill:#7fc9a0; font-size:13px; font-weight:bold; }
       .head  { fill:#f4ede0; font-size:12px; letter-spacing:1px; }
       @media (prefers-reduced-motion: reduce){
+        .ln,.cur,.bar1,.bar2{ animation:none !important; opacity:1 !important; }
+      }
+      .ln{ opacity:0; animation:show .01s linear forwards; }
