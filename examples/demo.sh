@@ -8,3 +8,6 @@
 # manifest the Go wrapper wrote.
 set -euo pipefail
 
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cairn="$here/rust/target/release/cairn"
+run="$here/bin/cairn-run"
