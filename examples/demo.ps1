@@ -11,3 +11,5 @@ $run   = Join-Path $here 'bin\cairn-run.exe'
 
 Write-Host '==> Building Rust engine'
 Push-Location (Join-Path $here 'rust'); cargo build --release | Out-Null; Pop-Location
+Write-Host '==> Building Go wrapper'
+New-Item -ItemType Directory -Force -Path (Join-Path $here 'bin') | Out-Null
