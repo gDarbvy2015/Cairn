@@ -20,3 +20,11 @@ type Entry struct {
 // Manifest is the cross-language cache-entry description.
 type Manifest struct {
 	Version  uint64
+	Producer string
+	Key      string
+	Command  []string
+	Inputs   []Entry
+	Outputs  []Entry
+}
+
+// ComputeKey derives the canonical cache key from inputs and an optional
