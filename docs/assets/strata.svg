@@ -12,3 +12,8 @@
       <stop offset="1" stop-color="#c68a2e"/>
     </linearGradient>
     <linearGradient id="rock2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8791f"/>
+      <stop offset="1" stop-color="#9c6318"/>
+    </linearGradient>
+    <linearGradient id="rock3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b5f66"/>
