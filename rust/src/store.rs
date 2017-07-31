@@ -26,3 +26,18 @@ use crate::manifest::{InputEntry, Manifest, OutputEntry};
 pub fn hash_file(path: &Path) -> std::io::Result<(String, u64)> {
     let mut file = fs::File::open(path)?;
     let mut hasher = Hasher::new();
+    let mut buf = [0u8; 64 * 1024];
+    let mut total: u64 = 0;
+    loop {
+        let n = file.read(&mut buf)?;
+        if n == 0 {
+            break;
+        }
+        hasher.update(&buf[..n]);
+        total += n as u64;
+    }
+    Ok((hasher.finalize_hex(), total))
+}
+
+/// The content-addressed store rooted at a directory.
+pub struct Store {
