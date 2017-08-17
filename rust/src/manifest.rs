@@ -28,3 +28,18 @@ pub struct InputEntry {
 #[derive(Clone, Debug, PartialEq)]
 pub struct OutputEntry {
     /// Logical path, using forward slashes.
+    pub path: String,
+    /// Content digest (canonical 16-char hex).
+    pub digest: String,
+    /// Size in bytes.
+    pub size: u64,
+}
+
+/// A complete cache manifest.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Manifest {
+    /// Format version.
+    pub version: u64,
+    /// Tool that produced this manifest, e.g. "cairn-rust" or "cairn-go".
+    pub producer: String,
+    /// The overall cache key derived from inputs (+ optional command).
