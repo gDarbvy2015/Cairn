@@ -21,3 +21,15 @@
 //
 // Standalone subcommands (no `--`):
 //
+//	cairn-run hash <file>...    print digests
+//	cairn-run version           print version
+package main
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"os/exec"
+	"strings"
+
+	"github.com/example/cairn/go/internal/cache"
