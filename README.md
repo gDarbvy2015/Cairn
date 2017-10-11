@@ -120,3 +120,24 @@ GREETINGS FROM CAIRN
 
 The output round-trips exactly; nothing recompiled. The [interop
 section](#rust--go-interop) shows the engine reading and verifying this same
+manifest.
+
+## The three strata: MISS → STORE → HIT
+
+Every wrapped command travels the same three-layer section:
+
+```
+  declared inputs ──FNV-1a──▶ input entries ─┐
+  command line ──────────────────────────────┼─▶ CACHE KEY
+                                              ┘
+        │
+        ▼   manifests/<key>.json exists?
+   no ──┴── yes
+   │         │
+  MISS      HIT ── restore every output blob, skip the command
+  run cmd
+   │
+  STORE ── capture outputs as content-addressed blobs, write manifest
+```
+
+Three rules govern the strata:
