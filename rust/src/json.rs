@@ -66,3 +66,26 @@ impl Json {
         match self {
             Json::Object(e) => Some(e),
             _ => None,
+        }
+    }
+
+    /// Look up a key in an object value.
+    pub fn get(&self, key: &str) -> Option<&Json> {
+        self.as_object()?
+            .iter()
+            .find(|(k, _)| k == key)
+            .map(|(_, v)| v)
+    }
+
+    /// Borrow this value as a string.
+    pub fn as_str(&self) -> Option<&str> {
+        match self {
+            Json::Str(s) => Some(s),
+            _ => None,
+        }
+    }
+
+    /// Borrow this value as an unsigned integer.
+    pub fn as_uint(&self) -> Option<u64> {
+        match self {
+            Json::Uint(n) => Some(*n),
