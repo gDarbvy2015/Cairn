@@ -25,3 +25,10 @@ func TestStreamingMatchesOneShot(t *testing.T) {
 	h := NewHasher()
 	h.Update([]byte("foo"))
 	h.Update([]byte("bar"))
+	if got := h.Hex(); got != HashBytes([]byte("foobar")) {
+		t.Errorf("streaming digest %s != one-shot", got)
+	}
+}
+
+// The manifest JSON produced here must match, byte-for-byte, what the Rust
+// engine emits for the same logical manifest (see rust manifest tests).
