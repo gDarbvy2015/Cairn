@@ -28,3 +28,13 @@ func OpenStore(root string) (*Store, error) {
 
 func (s *Store) objectPath(digest string) string {
 	shard := digest
+	if len(digest) >= 2 {
+		shard = digest[:2]
+	}
+	return filepath.Join(s.root, "objects", shard, digest)
+}
+
+func (s *Store) manifestPath(key string) string {
+	return filepath.Join(s.root, "manifests", key+".json")
+}
+
