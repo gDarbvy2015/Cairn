@@ -43,3 +43,11 @@ func ComputeKey(inputs []Entry, command []string) string {
 		h.Update([]byte(strconv.FormatUint(in.Size, 10)))
 		h.Update([]byte{0})
 	}
+	h.Update([]byte("cmd\x00"))
+	for _, arg := range command {
+		h.Update([]byte(arg))
+		h.Update([]byte{0})
+	}
+	return h.Hex()
+}
+
