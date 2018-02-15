@@ -38,3 +38,14 @@ func (s *Store) manifestPath(key string) string {
 	return filepath.Join(s.root, "manifests", key+".json")
 }
 
+// PutBlob stores content by its digest, returning the digest. Idempotent.
+func (s *Store) PutBlob(content []byte) (string, error) {
+	digest := HashBytes(content)
+	dest := s.objectPath(digest)
+	if _, err := os.Stat(dest); err == nil {
+		return digest, nil
+	}
+	if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+		return "", err
+	}
+	if err := atomicWrite(dest, content); err != nil {
