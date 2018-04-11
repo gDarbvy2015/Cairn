@@ -16,3 +16,7 @@
 const FNV_OFFSET_BASIS: u64 = 0xcbf2_9ce4_8422_2325;
 /// FNV-1a 64-bit prime.
 const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
+
+/// Streaming FNV-1a 64-bit hasher.
+///
+/// Feed bytes with [`Hasher::update`] and read the final digest with
