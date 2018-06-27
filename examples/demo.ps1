@@ -15,3 +15,5 @@ Write-Host '==> Building Go wrapper'
 New-Item -ItemType Directory -Force -Path (Join-Path $here 'bin') | Out-Null
 Push-Location (Join-Path $here 'go'); go build -o $run ./cmd/cairn-run; Pop-Location
 
+$work = Join-Path $env:TEMP ("cairn-demo-" + (Get-Random))
+New-Item -ItemType Directory -Path $work | Out-Null
