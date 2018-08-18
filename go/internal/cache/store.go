@@ -49,3 +49,13 @@ func (s *Store) PutBlob(content []byte) (string, error) {
 		return "", err
 	}
 	if err := atomicWrite(dest, content); err != nil {
+		return "", err
+	}
+	return digest, nil
+}
+
+// PutFile stores a file's contents as a blob, returning digest and size.
+func (s *Store) PutFile(path string) (string, uint64, error) {
+	content, err := os.ReadFile(path)
+	if err != nil {
+		return "", 0, err
