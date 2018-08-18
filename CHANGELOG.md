@@ -10,3 +10,4 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - **Rust engine (`cairn`)** — content-addressed store with hashing,
   store/restore of output manifests, and integrity verification.
+  - `hash`, `key`, `store`, `restore`, `verify`, `show` subcommands.
