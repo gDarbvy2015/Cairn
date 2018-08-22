@@ -15,3 +15,6 @@ type wireManifest struct {
 	Key      string      `json:"key"`
 	Command  []string    `json:"command"`
 	Inputs   []wireEntry `json:"inputs"`
+	Outputs  []wireEntry `json:"outputs"`
+}
+
