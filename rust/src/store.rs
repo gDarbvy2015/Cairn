@@ -55,3 +55,17 @@ impl Store {
 
     /// The path where a blob with the given digest lives.
     fn object_path(&self, digest: &str) -> PathBuf {
+        let shard = &digest[..2.min(digest.len())];
+        self.root.join("objects").join(shard).join(digest)
+    }
+
+    /// The path where a manifest with the given key lives.
+    fn manifest_path(&self, key: &str) -> PathBuf {
+        self.root.join("manifests").join(format!("{key}.json"))
+    }
+
+    /// Store a blob by its content, returning its digest. Idempotent: writing
+    /// content that already exists is a no-op.
+    pub fn put_blob(&self, content: &[u8]) -> std::io::Result<String> {
+        let mut hasher = Hasher::new();
+        hasher.update(content);
