@@ -9,3 +9,6 @@ jobs:
   rust:
     name: Rust engine
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
