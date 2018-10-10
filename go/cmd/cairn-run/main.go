@@ -45,3 +45,15 @@ const (
 
 type options struct {
 	cacheDir string
+	baseDir  string
+	inputs   []string
+	outputs  []string
+	force    bool
+	verbose  bool
+	command  []string
+}
+
+func main() {
+	args := os.Args[1:]
+	if len(args) == 0 {
+		usage(os.Stderr)
