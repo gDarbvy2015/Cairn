@@ -15,3 +15,6 @@ run="$here/bin/cairn-run"
 echo "==> Building Rust engine"
 (cd "$here/rust" && cargo build --release >/dev/null)
 echo "==> Building Go wrapper"
+mkdir -p "$here/bin"
+(cd "$here/go" && go build -o "$run" ./cmd/cairn-run)
+
