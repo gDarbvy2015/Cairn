@@ -22,3 +22,8 @@
     <linearGradient id="rock4" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#33373d"/>
       <stop offset="1" stop-color="#24272c"/>
+    </linearGradient>
+    <style>
+      .lbl   { fill:#f4ede0; font-size:12px; letter-spacing:.5px; }
+      .dig   { fill:#8fd0e8; font-size:11px; letter-spacing:1px; }
+      .cap   { fill:#2b2f34; font-size:13px; }
