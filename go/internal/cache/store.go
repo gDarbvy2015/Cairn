@@ -59,3 +59,13 @@ func (s *Store) PutFile(path string) (string, uint64, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return "", 0, err
+	}
+	digest, err := s.PutBlob(content)
+	if err != nil {
+		return "", 0, err
+	}
+	return digest, uint64(len(content)), nil
+}
+
+// GetBlob reads a blob by digest.
+func (s *Store) GetBlob(digest string) ([]byte, error) {
