@@ -14,3 +14,6 @@ RUST_BIN := rust/target/release/cairn$(EXE)
 GO_BIN   := bin/cairn-run$(EXE)
 
 .PHONY: all build build-rust build-go test test-rust test-go fmt vet clean demo
+
+all: build
+
