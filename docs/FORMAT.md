@@ -20,3 +20,10 @@ The **canonical digest** is the final `state` rendered as a zero-padded,
 lowercase, 16-character hexadecimal string (`%016x`).
 
 ### Reference vectors
+
+| Input      | Canonical digest     |
+| ---------- | -------------------- |
+| `""`       | `cbf29ce484222325`   |
+| `"a"`      | `af63dc4c8601ec8c`   |
+| `"foobar"` | `85944171f73967e8`   |
+
