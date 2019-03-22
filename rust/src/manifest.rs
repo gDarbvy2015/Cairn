@@ -58,3 +58,18 @@ impl Manifest {
     ///
     /// The key is defined as the FNV-1a digest of a canonical byte stream:
     ///
+    /// ```text
+    /// "cairn-key\x00" version "\x00"
+    /// for each input (sorted by path):
+    ///     path "\x00" digest "\x00" size "\x00"
+    /// "cmd\x00"
+    /// for each command arg (in order):
+    ///     arg "\x00"
+    /// ```
+    ///
+    /// Inputs MUST be sorted by path before calling. The Go implementation
+    /// reproduces this stream byte-for-byte.
+    pub fn compute_key(inputs: &[InputEntry], command: &[String]) -> String {
+        let mut h = Hasher::new();
+        h.update(b"cairn-key\x00");
+        h.update(FORMAT_VERSION.to_string().as_bytes());
