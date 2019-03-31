@@ -46,3 +46,10 @@ func TestManifestCanonicalJSON(t *testing.T) {
 		Command:  command,
 		Inputs:   inputs,
 		Outputs: []Entry{
+			{Path: "out/a.o", Digest: "cbf29ce484222325", Size: 0},
+		},
+	}
+	got := m.ToJSON()
+
+	// Parse it back and re-encode to confirm stability.
+	parsed, err := ParseManifest([]byte(got))
