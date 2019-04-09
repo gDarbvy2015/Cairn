@@ -73,3 +73,18 @@ impl Manifest {
         let mut h = Hasher::new();
         h.update(b"cairn-key\x00");
         h.update(FORMAT_VERSION.to_string().as_bytes());
+        h.update(b"\x00");
+        for input in inputs {
+            h.update(input.path.as_bytes());
+            h.update(b"\x00");
+            h.update(input.digest.as_bytes());
+            h.update(b"\x00");
+            h.update(input.size.to_string().as_bytes());
+            h.update(b"\x00");
+        }
+        h.update(b"cmd\x00");
+        for arg in command {
+            h.update(arg.as_bytes());
+            h.update(b"\x00");
+        }
+        h.finalize_hex()
