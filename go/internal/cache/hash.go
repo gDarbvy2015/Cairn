@@ -11,3 +11,7 @@ package cache
 import (
 	"fmt"
 	"io"
+	"os"
+)
+
+const (
