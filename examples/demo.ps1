@@ -17,3 +17,6 @@ Push-Location (Join-Path $here 'go'); go build -o $run ./cmd/cairn-run; Pop-Loca
 
 $work = Join-Path $env:TEMP ("cairn-demo-" + (Get-Random))
 New-Item -ItemType Directory -Path $work | Out-Null
+Push-Location $work
+try {
+    Write-Host "`n==> Create a source input"
