@@ -69,3 +69,13 @@ func (s *Store) PutFile(path string) (string, uint64, error) {
 
 // GetBlob reads a blob by digest.
 func (s *Store) GetBlob(digest string) ([]byte, error) {
+	return os.ReadFile(s.objectPath(digest))
+}
+
+// HasBlob reports whether a blob with the digest exists.
+func (s *Store) HasBlob(digest string) bool {
+	_, err := os.Stat(s.objectPath(digest))
+	return err == nil
+}
+
+// PutManifest persists a manifest under its key using canonical JSON.
