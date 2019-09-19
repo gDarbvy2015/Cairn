@@ -17,3 +17,6 @@ GO_BIN   := bin/cairn-run$(EXE)
 
 all: build
 
+build: build-rust build-go ## Build both binaries
+
+build-rust: ## Build the Rust engine (release)
