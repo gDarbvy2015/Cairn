@@ -32,3 +32,8 @@
       .icy   { fill:#8fd0e8; }
       @media (prefers-reduced-motion: reduce){
         .drop{ animation:none !important; }
+      }
+      .drop{ animation:fall 6s cubic-bezier(.5,0,.6,1) infinite; }
+      .d2{ animation-delay:2s; }
+      .d3{ animation-delay:4s; }
+      @keyframes fall{
