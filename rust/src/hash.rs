@@ -25,3 +25,7 @@ const FNV_PRIME: u64 = 0x0000_0100_0000_01b3;
 #[derive(Clone, Copy, Debug)]
 pub struct Hasher {
     state: u64,
+}
+
+impl Default for Hasher {
+    fn default() -> Self {
