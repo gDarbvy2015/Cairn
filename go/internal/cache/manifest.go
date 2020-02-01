@@ -66,3 +66,11 @@ func NormalizePath(p string) string {
 // outputs.
 func (m *Manifest) ToJSON() string {
 	var b strings.Builder
+	b.WriteByte('{')
+	writeKey(&b, "version")
+	b.WriteString(strconv.FormatUint(m.Version, 10))
+	b.WriteByte(',')
+	writeKey(&b, "producer")
+	writeJSONString(&b, m.Producer)
+	b.WriteByte(',')
+	writeKey(&b, "key")
