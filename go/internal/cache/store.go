@@ -79,3 +79,14 @@ func (s *Store) HasBlob(digest string) bool {
 }
 
 // PutManifest persists a manifest under its key using canonical JSON.
+func (s *Store) PutManifest(m *Manifest) error {
+	dest := s.manifestPath(m.Key)
+	if err := os.MkdirAll(filepath.Dir(dest), 0o755); err != nil {
+		return err
+	}
+	return atomicWrite(dest, []byte(m.ToJSON()))
+}
+
+// GetManifest loads a manifest by key, returning (nil, nil) on a cache miss.
+func (s *Store) GetManifest(key string) (*Manifest, error) {
+	path := s.manifestPath(key)
