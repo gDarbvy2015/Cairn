@@ -57,3 +57,14 @@ func main() {
 	args := os.Args[1:]
 	if len(args) == 0 {
 		usage(os.Stderr)
+		os.Exit(exitError)
+	}
+
+	// Standalone subcommands that do not take a `--` command.
+	switch args[0] {
+	case "version", "--version", "-V":
+		fmt.Printf("cairn-run %s (format v%d)\n", version, cache.FormatVersion)
+		return
+	case "help", "-h", "--help":
+		usage(os.Stdout)
+		return
