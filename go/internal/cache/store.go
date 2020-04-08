@@ -100,3 +100,13 @@ func (s *Store) GetManifest(key string) (*Manifest, error) {
 	return ParseManifest(data)
 }
 
+// HasManifest reports whether a manifest exists for the key.
+func (s *Store) HasManifest(key string) bool {
+	_, err := os.Stat(s.manifestPath(key))
+	return err == nil
+}
+
+// HashInputs hashes input files relative to base into sorted entries.
+func HashInputs(base string, paths []string) ([]Entry, error) {
+	entries := make([]Entry, 0, len(paths))
+	for _, p := range paths {
