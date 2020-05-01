@@ -21,3 +21,6 @@ type wireManifest struct {
 type wireEntry struct {
 	Path   string `json:"path"`
 	Digest string `json:"digest"`
+	Size   uint64 `json:"size"`
+}
+
