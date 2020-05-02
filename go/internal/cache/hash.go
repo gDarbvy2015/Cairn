@@ -20,3 +20,7 @@ const (
 )
 
 // Hasher is a streaming FNV-1a 64-bit hasher, matching rust/src/hash.rs.
+type Hasher struct {
+	state uint64
+}
+
