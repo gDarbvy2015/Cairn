@@ -6,3 +6,5 @@
 //! exactly by the companion Go wrapper so the two tools interoperate.
 //!
 //! # Modules
+//!
+//! - [`hash`]: deterministic, non-cryptographic FNV-1a content hashing.
