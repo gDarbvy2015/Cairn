@@ -141,3 +141,18 @@ impl Store {
 
     /// Hash a set of input files (relative to `base`) into sorted input
     /// entries. Paths are normalized to forward slashes for cross-platform
+    /// stability.
+    pub fn hash_inputs(base: &Path, paths: &[String]) -> std::io::Result<Vec<InputEntry>> {
+        let mut entries = Vec::with_capacity(paths.len());
+        for p in paths {
+            let full = base.join(p);
+            let (digest, size) = hash_file(&full)?;
+            entries.push(InputEntry {
+                path: normalize_path(p),
+                digest,
+                size,
+            });
+        }
+        entries.sort_by(|a, b| a.path.cmp(&b.path));
+        Ok(entries)
+    }
