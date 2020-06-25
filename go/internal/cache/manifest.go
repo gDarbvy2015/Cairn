@@ -81,3 +81,11 @@ func (m *Manifest) ToJSON() string {
 	b.WriteByte(',')
 	writeKey(&b, "inputs")
 	writeEntryArray(&b, m.Inputs)
+	b.WriteByte(',')
+	writeKey(&b, "outputs")
+	writeEntryArray(&b, m.Outputs)
+	b.WriteByte('}')
+	return b.String()
+}
+
+func writeKey(b *strings.Builder, key string) {
