@@ -135,3 +135,26 @@ pub struct ParseError {
     pub message: String,
     pub offset: usize,
 }
+
+impl std::fmt::Display for ParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "JSON parse error at byte {}: {}",
+            self.offset, self.message
+        )
+    }
+}
+
+impl std::error::Error for ParseError {}
+
+/// Parse a JSON document into a [`Json`] value.
+pub fn parse(input: &str) -> Result<Json, ParseError> {
+    let mut p = Parser {
+        bytes: input.as_bytes(),
+        pos: 0,
+    };
+    p.skip_ws();
+    let value = p.parse_value()?;
+    p.skip_ws();
+    if p.pos != p.bytes.len() {
