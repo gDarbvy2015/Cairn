@@ -13,3 +13,4 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - `hash`, `key`, `store`, `restore`, `verify`, `show` subcommands.
   - Standard-library-only implementation, including a small canonical JSON
     reader/writer.
+- **Go wrapper (`cairn-run`)** — cache-aware command execution.
