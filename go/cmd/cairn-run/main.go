@@ -68,3 +68,15 @@ func main() {
 	case "help", "-h", "--help":
 		usage(os.Stdout)
 		return
+	case "hash":
+		if err := cmdHash(args[1:]); err != nil {
+			fmt.Fprintf(os.Stderr, "cairn-run: error: %v\n", err)
+			os.Exit(exitError)
+		}
+		return
+	}
+
+	opts, err := parseOptions(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "cairn-run: error: %v\n", err)
+		os.Exit(exitError)
