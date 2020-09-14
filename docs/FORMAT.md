@@ -42,3 +42,10 @@ a security boundary. FNV-1a was chosen because it is:
 
 Do not use Cairn digests to defend against malicious tampering. If you need
 that, layer a signed manifest or a cryptographic digest on top.
+
+## 2. Cache key
+
+A cache key identifies a logical build step. It is the FNV-1a canonical digest
+of the following byte stream, where `\x00` is a single NUL byte:
+
+```
