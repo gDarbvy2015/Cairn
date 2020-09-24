@@ -22,3 +22,6 @@ mkdir -p "$here/bin"
 if [[ "${OS:-}" == "Windows_NT" ]]; then
   cairn="$cairn.exe"; run="$run.exe"
 fi
+
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
