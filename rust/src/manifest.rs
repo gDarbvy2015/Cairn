@@ -118,3 +118,18 @@ impl Manifest {
         );
         let command = Json::Array(self.command.iter().map(|c| Json::Str(c.clone())).collect());
         let doc = json::object(vec![
+            ("version", Json::Uint(self.version)),
+            ("producer", Json::Str(self.producer.clone())),
+            ("key", Json::Str(self.key.clone())),
+            ("command", command),
+            ("inputs", inputs),
+            ("outputs", outputs),
+        ]);
+        doc.encode()
+    }
+
+    /// Parse a manifest from canonical (or any well-formed) JSON.
+    pub fn from_json(text: &str) -> Result<Manifest, String> {
+        let doc = json::parse(text).map_err(|e| e.to_string())?;
+        let version = doc
+            .get("version")
