@@ -67,3 +67,10 @@ func TestKeyStableAndCommandSensitive(t *testing.T) {
 	k2 := ComputeKey(inputs, []string{"go", "build"})
 	if k1 != k2 {
 		t.Errorf("key not stable: %s != %s", k1, k2)
+	}
+	k3 := ComputeKey(inputs, []string{"go", "test"})
+	if k1 == k3 {
+		t.Errorf("key should change with command")
+	}
+}
+
