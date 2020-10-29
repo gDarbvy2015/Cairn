@@ -55,3 +55,18 @@ fn run(args: &[String]) -> Result<ExitCode, String> {
                 "cairn {} (format v{})",
                 env!("CARGO_PKG_VERSION"),
                 FORMAT_VERSION
+            );
+            Ok(ExitCode::SUCCESS)
+        }
+        other => Err(format!("unknown subcommand '{other}' (try 'cairn help')")),
+    }
+}
+
+/// A minimal flag parser tailored to Cairn's options. Recognizes repeated
+/// `--input`/`--output`, single-valued `--key`/`--cache-dir`/`--out-dir`, and
+/// a `--` separator after which everything is treated as a command.
+#[derive(Default)]
+struct Parsed {
+    inputs: Vec<String>,
+    outputs: Vec<String>,
+    key: Option<String>,
