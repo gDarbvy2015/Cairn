@@ -70,3 +70,17 @@ struct Parsed {
     inputs: Vec<String>,
     outputs: Vec<String>,
     key: Option<String>,
+    cache_dir: Option<String>,
+    out_dir: Option<String>,
+    base_dir: Option<String>,
+    command: Vec<String>,
+    positional: Vec<String>,
+}
+
+fn parse(args: &[String]) -> Result<Parsed, String> {
+    let mut p = Parsed::default();
+    let mut i = 0;
+    while i < args.len() {
+        let a = &args[i];
+        match a.as_str() {
+            "--" => {
