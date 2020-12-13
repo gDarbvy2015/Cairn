@@ -80,3 +80,15 @@ func main() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "cairn-run: error: %v\n", err)
 		os.Exit(exitError)
+	}
+	code, err := runWrapped(opts)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "cairn-run: error: %v\n", err)
+		os.Exit(exitError)
+	}
+	os.Exit(code)
+}
+
+func parseOptions(args []string) (options, error) {
+	opts := options{cacheDir: defaultCache, baseDir: "."}
+	i := 0
