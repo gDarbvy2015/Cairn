@@ -27,3 +27,7 @@ jobs:
       - name: Build release
         run: cargo build --release
 
+  go:
+    name: Go wrapper
+    runs-on: ubuntu-latest
+    defaults:
