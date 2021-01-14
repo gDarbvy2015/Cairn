@@ -56,3 +56,11 @@ for each input entry, sorted ascending by path:
     <digest> "\x00"
     <size-decimal> "\x00"
 "cmd\x00"
+for each command argument, in order:
+    <arg> "\x00"
+```
+
+- `format-version-decimal` is the decimal ASCII of the format version (`1`).
+- Inputs **must** be sorted by `path` (byte-wise ascending) before hashing.
+- `path` uses forward slashes on all platforms.
+- `size-decimal` is the decimal ASCII of the byte length.
