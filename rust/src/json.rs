@@ -227,3 +227,26 @@ impl<'a> Parser<'a> {
         let n = text
             .parse::<u64>()
             .map_err(|_| self.err("number out of range"))?;
+        Ok(Json::Uint(n))
+    }
+
+    fn parse_string(&mut self) -> Result<String, ParseError> {
+        // Consume opening quote.
+        self.pos += 1;
+        let mut s = String::new();
+        loop {
+            match self.peek() {
+                None => return Err(self.err("unterminated string")),
+                Some(b'"') => {
+                    self.pos += 1;
+                    return Ok(s);
+                }
+                Some(b'\\') => {
+                    self.pos += 1;
+                    match self.peek() {
+                        Some(b'"') => s.push('"'),
+                        Some(b'\\') => s.push('\\'),
+                        Some(b'/') => s.push('/'),
+                        Some(b'n') => s.push('\n'),
+                        Some(b'r') => s.push('\r'),
+                        Some(b't') => s.push('\t'),
