@@ -29,3 +29,6 @@ func ParseManifest(data []byte) (*Manifest, error) {
 	var w wireManifest
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
+	if err := dec.Decode(&w); err != nil {
+		return nil, fmt.Errorf("decoding manifest: %w", err)
+	}
