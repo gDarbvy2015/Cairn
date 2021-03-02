@@ -81,3 +81,10 @@ func TestStoreRestoreVerify(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(work, "in.txt"), []byte("foobar"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(work, "out.txt"), []byte("result-bytes"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	store, err := OpenStore(filepath.Join(dir, "cache"))
