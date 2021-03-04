@@ -60,3 +60,10 @@ func TestManifestCanonicalJSON(t *testing.T) {
 		t.Errorf("re-encoded JSON differs:\n first: %s\nsecond: %s", got, again)
 	}
 }
+
+func TestKeyStableAndCommandSensitive(t *testing.T) {
+	inputs := []Entry{{Path: "x", Digest: "af63dc4c8601ec8c", Size: 1}}
+	k1 := ComputeKey(inputs, []string{"go", "build"})
+	k2 := ComputeKey(inputs, []string{"go", "build"})
+	if k1 != k2 {
+		t.Errorf("key not stable: %s != %s", k1, k2)
