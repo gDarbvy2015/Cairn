@@ -204,3 +204,26 @@ impl<'a> Parser<'a> {
     fn parse_bool(&mut self) -> Result<Json, ParseError> {
         if self.bytes[self.pos..].starts_with(b"true") {
             self.pos += 4;
+            Ok(Json::Bool(true))
+        } else if self.bytes[self.pos..].starts_with(b"false") {
+            self.pos += 5;
+            Ok(Json::Bool(false))
+        } else {
+            Err(self.err("invalid literal"))
+        }
+    }
+
+    fn parse_uint(&mut self) -> Result<Json, ParseError> {
+        let start = self.pos;
+        while let Some(c) = self.peek() {
+            if c.is_ascii_digit() {
+                self.pos += 1;
+            } else {
+                break;
+            }
+        }
+        let slice = &self.bytes[start..self.pos];
+        let text = std::str::from_utf8(slice).map_err(|_| self.err("invalid number"))?;
+        let n = text
+            .parse::<u64>()
+            .map_err(|_| self.err("number out of range"))?;
