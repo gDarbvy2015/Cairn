@@ -10,3 +10,5 @@ readme = "../README.md"
 [[bin]]
 name = "cairn"
 path = "src/main.rs"
+
+[lib]
