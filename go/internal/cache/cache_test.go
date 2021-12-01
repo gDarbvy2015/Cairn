@@ -88,3 +88,10 @@ func TestStoreRestoreVerify(t *testing.T) {
 	}
 
 	store, err := OpenStore(filepath.Join(dir, "cache"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	inputs, err := HashInputs(work, []string{"in.txt"})
+	if err != nil {
+		t.Fatal(err)
+	}
