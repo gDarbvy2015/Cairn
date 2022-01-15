@@ -128,3 +128,14 @@ func parseOptions(args []string) (options, error) {
 		case "--verbose":
 			opts.verbose = true
 		default:
+			return opts, fmt.Errorf("unknown flag %q", a)
+		}
+		i++
+	}
+	if len(opts.command) == 0 {
+		return opts, fmt.Errorf("no command given (expected '-- <command> [args...]')")
+	}
+	return opts, nil
+}
+
+func takeValue(args []string, i *int, flag string) (string, error) {
