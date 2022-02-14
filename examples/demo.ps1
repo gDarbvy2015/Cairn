@@ -20,3 +20,5 @@ New-Item -ItemType Directory -Path $work | Out-Null
 Push-Location $work
 try {
     Write-Host "`n==> Create a source input"
+    Set-Content -Path input.txt -Value 'greetings from cairn' -NoNewline
+    & $cairn hash input.txt
