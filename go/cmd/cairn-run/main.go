@@ -163,3 +163,15 @@ func runWrapped(opts options) (int, error) {
 		manifest, err := store.GetManifest(key)
 		if err != nil {
 			return exitError, err
+		}
+		if manifest != nil {
+			n, err := store.RestoreOutputs(opts.baseDir, manifest)
+			if err == nil {
+				if opts.verbose {
+					fmt.Fprintf(os.Stderr, "cairn-run: cache HIT %s (restored %d output(s))\n", key, n)
+				}
+				return 0, nil
+			}
+			// A manifest exists but restore failed (e.g. pruned blobs): fall
+			// through to re-run rather than fail outright.
+			if opts.verbose {
