@@ -133,3 +133,18 @@ impl Manifest {
         let doc = json::parse(text).map_err(|e| e.to_string())?;
         let version = doc
             .get("version")
+            .and_then(Json::as_uint)
+            .ok_or("missing 'version'")?;
+        let producer = doc
+            .get("producer")
+            .and_then(Json::as_str)
+            .ok_or("missing 'producer'")?
+            .to_string();
+        let key = doc
+            .get("key")
+            .and_then(Json::as_str)
+            .ok_or("missing 'key'")?
+            .to_string();
+        let command = doc
+            .get("command")
+            .and_then(Json::as_array)
