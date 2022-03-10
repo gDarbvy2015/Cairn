@@ -35,3 +35,7 @@ printf 'greetings from cairn' > input.txt
 echo
 echo "==> First run (expect cache MISS, command executes)"
 "$run" --verbose --input input.txt --output output.txt -- \
+  sh -c 'tr a-z A-Z < input.txt > output.txt'
+echo "output.txt: $(cat output.txt)"
+
+echo
