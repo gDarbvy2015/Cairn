@@ -24,3 +24,8 @@ type Hasher struct {
 	state uint64
 }
 
+// NewHasher returns a hasher seeded with the FNV offset basis.
+func NewHasher() *Hasher {
+	return &Hasher{state: fnvOffsetBasis}
+}
+
