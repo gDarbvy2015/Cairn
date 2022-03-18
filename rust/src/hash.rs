@@ -47,3 +47,8 @@ impl Hasher {
         for &byte in bytes {
             state ^= u64::from(byte);
             state = state.wrapping_mul(FNV_PRIME);
+        }
+        self.state = state;
+    }
+
+    /// Return the raw 64-bit digest of everything absorbed so far.
