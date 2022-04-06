@@ -64,3 +64,10 @@ for each command argument, in order:
 - Inputs **must** be sorted by `path` (byte-wise ascending) before hashing.
 - `path` uses forward slashes on all platforms.
 - `size-decimal` is the decimal ASCII of the byte length.
+
+Because the command participates in the key, changing the command (or any
+argument) yields a different key, so unrelated steps never collide.
+
+## 3. Manifest JSON
+
+A manifest is a single JSON object serialized **canonically**: compact (no
