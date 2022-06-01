@@ -22,3 +22,5 @@ try {
     Write-Host "`n==> Create a source input"
     Set-Content -Path input.txt -Value 'greetings from cairn' -NoNewline
     & $cairn hash input.txt
+
+    Write-Host "`n==> First run (expect cache MISS, command executes)"
