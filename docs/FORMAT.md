@@ -71,3 +71,11 @@ argument) yields a different key, so unrelated steps never collide.
 ## 3. Manifest JSON
 
 A manifest is a single JSON object serialized **canonically**: compact (no
+insignificant whitespace) with keys in the fixed order below.
+
+```json
+{
+  "version": 1,
+  "producer": "cairn-go",
+  "key": "6021f3a455f5af1f",
+  "command": ["cc", "-c", "main.c", "-o", "main.o"],
