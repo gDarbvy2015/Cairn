@@ -96,3 +96,11 @@ func writeKey(b *strings.Builder, key string) {
 func writeStringArray(b *strings.Builder, items []string) {
 	b.WriteByte('[')
 	for i, it := range items {
+		if i > 0 {
+			b.WriteByte(',')
+		}
+		writeJSONString(b, it)
+	}
+	b.WriteByte(']')
+}
+
