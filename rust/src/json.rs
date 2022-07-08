@@ -296,3 +296,26 @@ impl<'a> Parser<'a> {
         self.skip_ws();
         if self.peek() == Some(b']') {
             self.pos += 1;
+            return Ok(Json::Array(items));
+        }
+        loop {
+            let value = self.parse_value()?;
+            items.push(value);
+            self.skip_ws();
+            match self.peek() {
+                Some(b',') => {
+                    self.pos += 1;
+                }
+                Some(b']') => {
+                    self.pos += 1;
+                    return Ok(Json::Array(items));
+                }
+                _ => return Err(self.err("expected ',' or ']' in array")),
+            }
+        }
+    }
+
+    fn parse_object(&mut self) -> Result<Json, ParseError> {
+        self.pos += 1; // consume '{'
+        let mut entries: Vec<(String, Json)> = Vec::new();
+        self.skip_ws();
