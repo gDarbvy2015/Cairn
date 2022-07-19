@@ -46,3 +46,7 @@ jobs:
       - name: Test
         run: go test ./...
       - name: Build
+        run: go build ./...
+
+  interop:
+    name: Cross-language interop
