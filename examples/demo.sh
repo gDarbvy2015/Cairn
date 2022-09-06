@@ -32,3 +32,6 @@ echo "==> Create a source input"
 printf 'greetings from cairn' > input.txt
 "$cairn" hash input.txt
 
+echo
+echo "==> First run (expect cache MISS, command executes)"
+"$run" --verbose --input input.txt --output output.txt -- \
