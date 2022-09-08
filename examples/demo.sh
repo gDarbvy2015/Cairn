@@ -42,3 +42,7 @@ echo
 echo "==> Delete output, run again (expect cache HIT, command skipped)"
 rm -f output.txt
 "$run" --verbose --input input.txt --output output.txt -- \
+  sh -c 'tr a-z A-Z < input.txt > output.txt'
+echo "output.txt restored: $(cat output.txt)"
+
+echo
