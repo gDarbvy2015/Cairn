@@ -104,3 +104,11 @@ func writeStringArray(b *strings.Builder, items []string) {
 	b.WriteByte(']')
 }
 
+func writeEntryArray(b *strings.Builder, entries []Entry) {
+	b.WriteByte('[')
+	for i, e := range entries {
+		if i > 0 {
+			b.WriteByte(',')
+		}
+		b.WriteByte('{')
+		writeKey(b, "path")
