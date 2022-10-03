@@ -30,3 +30,6 @@
       @keyframes grow1{to{transform:scaleX(1)}}
       @keyframes grow2{to{transform:scaleX(.06)}}
     </style>
+  </defs>
+
+  <!-- terminal window -->
