@@ -139,3 +139,15 @@ func parseOptions(args []string) (options, error) {
 }
 
 func takeValue(args []string, i *int, flag string) (string, error) {
+	*i++
+	if *i >= len(args) {
+		return "", fmt.Errorf("flag %q requires a value", flag)
+	}
+	return args[*i], nil
+}
+
+// runWrapped implements the cache-aware execution flow and returns the process
+// exit code to propagate.
+func runWrapped(opts options) (int, error) {
+	store, err := cache.OpenStore(opts.cacheDir)
+	if err != nil {
