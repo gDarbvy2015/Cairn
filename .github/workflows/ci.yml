@@ -53,3 +53,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [rust, go]
     steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-go@v5
+        with:
