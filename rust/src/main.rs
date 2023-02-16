@@ -185,3 +185,17 @@ fn cmd_store(args: &[String]) -> Result<ExitCode, String> {
     let outputs = store
         .store_outputs(&base, &p.outputs)
         .map_err(|e| e.to_string())?;
+    let manifest = Manifest {
+        version: FORMAT_VERSION,
+        producer: PRODUCER.to_string(),
+        key: key.clone(),
+        command: p.command.clone(),
+        inputs,
+        outputs,
+    };
+    store.put_manifest(&manifest).map_err(|e| e.to_string())?;
+    println!("stored {} (outputs: {})", key, manifest.outputs.len());
+    Ok(ExitCode::SUCCESS)
+}
+
+fn cmd_restore(args: &[String]) -> Result<ExitCode, String> {
