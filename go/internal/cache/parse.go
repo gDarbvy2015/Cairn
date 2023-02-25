@@ -32,3 +32,6 @@ func ParseManifest(data []byte) (*Manifest, error) {
 	if err := dec.Decode(&w); err != nil {
 		return nil, fmt.Errorf("decoding manifest: %w", err)
 	}
+	m := &Manifest{
+		Version:  w.Version,
+		Producer: w.Producer,
