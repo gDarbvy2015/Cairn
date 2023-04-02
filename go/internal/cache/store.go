@@ -161,3 +161,14 @@ func (s *Store) RestoreOutputs(base string, m *Manifest) (int, error) {
 }
 
 // VerifyReport summarizes a manifest verification.
+type VerifyReport struct {
+	OK         int
+	Missing    []string
+	Corrupt    []string
+	KeyMatches bool
+}
+
+// Healthy reports whether nothing is missing/corrupt and the key checks out.
+func (r VerifyReport) Healthy() bool {
+	return len(r.Missing) == 0 && len(r.Corrupt) == 0 && r.KeyMatches
+}
