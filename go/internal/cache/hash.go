@@ -33,3 +33,8 @@ func NewHasher() *Hasher {
 func (h *Hasher) Update(b []byte) {
 	state := h.state
 	for _, c := range b {
+		state ^= uint64(c)
+		state *= fnvPrime
+	}
+	h.state = state
+}
