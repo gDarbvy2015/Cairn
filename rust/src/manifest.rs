@@ -223,3 +223,18 @@ mod tests {
             key,
             command,
             inputs,
+            outputs: vec![OutputEntry {
+                path: "out/a.o".into(),
+                digest: "cbf29ce484222325".into(),
+                size: 0,
+            }],
+        }
+    }
+
+    #[test]
+    fn json_roundtrip() {
+        let m = sample();
+        let text = m.to_json();
+        let back = Manifest::from_json(&text).unwrap();
+        assert_eq!(m, back);
+    }
