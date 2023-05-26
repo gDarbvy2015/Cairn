@@ -6,3 +6,4 @@ Cargo.lock
 # Go
 /bin/
 *.exe
+*.test
