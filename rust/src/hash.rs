@@ -61,3 +61,7 @@ impl Hasher {
     /// form the Go implementation must reproduce byte-for-byte.
     pub fn finalize_hex(&self) -> String {
         format!("{:016x}", self.state)
+    }
+}
+
+/// Convenience: hash a byte slice and return the canonical hex digest.
