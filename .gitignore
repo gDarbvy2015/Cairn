@@ -7,3 +7,4 @@ Cargo.lock
 /bin/
 *.exe
 *.test
+*.out
