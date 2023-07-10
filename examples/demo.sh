@@ -39,3 +39,6 @@ echo "==> First run (expect cache MISS, command executes)"
 echo "output.txt: $(cat output.txt)"
 
 echo
+echo "==> Delete output, run again (expect cache HIT, command skipped)"
+rm -f output.txt
+"$run" --verbose --input input.txt --output output.txt -- \
