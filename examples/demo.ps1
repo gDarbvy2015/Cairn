@@ -31,3 +31,5 @@ try {
     Remove-Item output.txt
     & $run --verbose --input input.txt --output output.txt -- powershell -NoProfile -Command "(Get-Content input.txt).ToUpper() | Set-Content output.txt -NoNewline"
     Write-Host "output.txt restored: $(Get-Content output.txt)"
+
+    Write-Host "`n==> Cross-language: Rust computes the same key"
