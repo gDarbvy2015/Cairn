@@ -256,3 +256,17 @@ mod tests {
     use super::*;
     use crate::manifest::FORMAT_VERSION;
 
+    fn temp_dir(tag: &str) -> PathBuf {
+        let mut d = std::env::temp_dir();
+        let nanos = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos();
+        d.push(format!("cairn-test-{tag}-{nanos}"));
+        fs::create_dir_all(&d).unwrap();
+        d
+    }
+
+    #[test]
+    fn blob_roundtrip_and_dedup() {
+        let dir = temp_dir("blob");
