@@ -222,3 +222,15 @@ func execCommand(opts options) (int, error) {
 	cmd := exec.Command(opts.command[0], opts.command[1:]...)
 	cmd.Dir = opts.baseDir
 	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err == nil {
+		return 0, nil
+	}
+	var exitErr *exec.ExitError
+	if errors.As(err, &exitErr) {
+		return exitErr.ExitCode(), nil
+	}
+	return exitError, fmt.Errorf("running %q: %w", strings.Join(opts.command, " "), err)
+}
