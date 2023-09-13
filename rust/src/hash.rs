@@ -65,3 +65,8 @@ impl Hasher {
 }
 
 /// Convenience: hash a byte slice and return the canonical hex digest.
+pub fn hash_bytes(bytes: &[u8]) -> String {
+    let mut h = Hasher::new();
+    h.update(bytes);
+    h.finalize_hex()
+}
