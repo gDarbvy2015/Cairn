@@ -70,3 +70,7 @@ pub fn hash_bytes(bytes: &[u8]) -> String {
     h.update(bytes);
     h.finalize_hex()
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
