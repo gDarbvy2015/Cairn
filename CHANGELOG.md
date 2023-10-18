@@ -17,3 +17,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Cache HIT restores declared outputs; MISS runs the command and captures
     outputs. Failed commands are not cached.
   - `hash` and `version` helper subcommands.
+- **Shared format v1** — FNV-1a 64-bit content hashing, canonical cache-key
+  stream, and canonical manifest JSON, documented in `docs/FORMAT.md` and
