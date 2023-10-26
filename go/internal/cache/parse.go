@@ -35,3 +35,6 @@ func ParseManifest(data []byte) (*Manifest, error) {
 	m := &Manifest{
 		Version:  w.Version,
 		Producer: w.Producer,
+		Key:      w.Key,
+		Command:  w.Command,
+		Inputs:   convertEntries(w.Inputs),
