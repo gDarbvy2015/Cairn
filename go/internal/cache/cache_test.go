@@ -95,3 +95,10 @@ func TestStoreRestoreVerify(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	command := []string{"build"}
+	key := ComputeKey(inputs, command)
+	outputs, err := store.StoreOutputs(work, []string{"out.txt"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	m := &Manifest{
