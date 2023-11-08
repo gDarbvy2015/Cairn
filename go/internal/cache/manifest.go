@@ -127,3 +127,10 @@ func writeEntryArray(b *strings.Builder, entries []Entry) {
 // writeJSONString writes a JSON string literal with the same escaping rules as
 // the Rust writer (RFC 8259, lowercase \u for control chars).
 func writeJSONString(b *strings.Builder, s string) {
+	b.WriteByte('"')
+	for _, r := range s {
+		switch r {
+		case '"':
+			b.WriteString("\\\"")
+		case '\\':
+			b.WriteString("\\\\")
