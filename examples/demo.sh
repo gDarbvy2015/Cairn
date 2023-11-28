@@ -53,3 +53,6 @@ echo "key = $key"
 echo
 echo "==> Rust restores + verifies the Go-written manifest"
 rm -f output.txt
+"$cairn" restore --key "$key" --out-dir .
+"$cairn" verify --key "$key"
+echo "manifest:"
