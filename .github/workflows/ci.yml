@@ -50,3 +50,6 @@ jobs:
 
   interop:
     name: Cross-language interop
+    runs-on: ubuntu-latest
+    needs: [rust, go]
+    steps:
