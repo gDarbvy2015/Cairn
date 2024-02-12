@@ -170,3 +170,18 @@ fn cmd_store(args: &[String]) -> Result<ExitCode, String> {
     }
     let base = base_dir(&p);
     let store = Store::open(cache_root(&p)).map_err(|e| e.to_string())?;
+    let inputs = Store::hash_inputs(&base, &p.inputs).map_err(|e| e.to_string())?;
+    let computed_key = Manifest::compute_key(&inputs, &p.command);
+    // If the user supplied a key, honor it but warn on mismatch.
+    let key = match &p.key {
+        Some(k) if *k != computed_key => {
+            eprintln!(
+                "cairn: warning: supplied key {k} does not match computed key {computed_key}; using computed key"
+            );
+            computed_key
+        }
+        _ => computed_key,
+    };
+    let outputs = store
+        .store_outputs(&base, &p.outputs)
+        .map_err(|e| e.to_string())?;
