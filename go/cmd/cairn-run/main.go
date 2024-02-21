@@ -175,3 +175,15 @@ func runWrapped(opts options) (int, error) {
 			// A manifest exists but restore failed (e.g. pruned blobs): fall
 			// through to re-run rather than fail outright.
 			if opts.verbose {
+				fmt.Fprintf(os.Stderr, "cairn-run: manifest present but restore failed (%v); re-running\n", err)
+			}
+		} else if opts.verbose {
+			fmt.Fprintf(os.Stderr, "cairn-run: cache MISS %s\n", key)
+		}
+	} else if opts.verbose {
+		fmt.Fprintf(os.Stderr, "cairn-run: --force set, running command\n")
+	}
+
+	// Cache miss (or forced): execute the command.
+	exitCode, err := execCommand(opts)
+	if err != nil {
