@@ -52,3 +52,7 @@ impl Hasher {
     }
 
     /// Return the raw 64-bit digest of everything absorbed so far.
+    pub fn finalize(&self) -> u64 {
+        self.state
+    }
+
