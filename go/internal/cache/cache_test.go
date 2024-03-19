@@ -102,3 +102,10 @@ func TestStoreRestoreVerify(t *testing.T) {
 		t.Fatal(err)
 	}
 	m := &Manifest{
+		Version:  FormatVersion,
+		Producer: producerTag,
+		Key:      key,
+		Command:  command,
+		Inputs:   inputs,
+		Outputs:  outputs,
+	}
