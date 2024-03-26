@@ -270,3 +270,18 @@ mod tests {
     #[test]
     fn blob_roundtrip_and_dedup() {
         let dir = temp_dir("blob");
+        let store = Store::open(dir.join("cache")).unwrap();
+        let d1 = store.put_blob(b"hello").unwrap();
+        let d2 = store.put_blob(b"hello").unwrap();
+        assert_eq!(d1, d2);
+        assert!(store.has_blob(&d1));
+        assert_eq!(store.get_blob(&d1).unwrap(), b"hello");
+        fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn store_restore_and_verify() {
+        let dir = temp_dir("restore");
+        let work = dir.join("work");
+        fs::create_dir_all(&work).unwrap();
+        fs::write(work.join("in.txt"), b"foobar").unwrap();
