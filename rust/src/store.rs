@@ -285,3 +285,17 @@ mod tests {
         let work = dir.join("work");
         fs::create_dir_all(&work).unwrap();
         fs::write(work.join("in.txt"), b"foobar").unwrap();
+        fs::write(work.join("out.txt"), b"result-bytes").unwrap();
+
+        let store = Store::open(dir.join("cache")).unwrap();
+        let inputs = Store::hash_inputs(&work, &["in.txt".into()]).unwrap();
+        let command = vec!["build".to_string()];
+        let key = Manifest::compute_key(&inputs, &command);
+        let outputs = store.store_outputs(&work, &["out.txt".into()]).unwrap();
+        let manifest = Manifest {
+            version: FORMAT_VERSION,
+            producer: "cairn-rust".into(),
+            key: key.clone(),
+            command,
+            inputs,
+            outputs,
