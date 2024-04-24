@@ -242,3 +242,18 @@ fn cmd_verify(args: &[String]) -> Result<ExitCode, String> {
         Ok(ExitCode::SUCCESS)
     } else {
         eprintln!("FAIL: cache integrity check failed");
+        Ok(ExitCode::from(3))
+    }
+}
+
+fn cmd_show(args: &[String]) -> Result<ExitCode, String> {
+    let p = parse(args)?;
+    let key = p.key.clone().ok_or("show: --key is required")?;
+    let store = Store::open(cache_root(&p)).map_err(|e| e.to_string())?;
+    match store.get_manifest(&key).map_err(|e| e.to_string())? {
+        Some(m) => {
+            println!("{}", m.to_json());
+            Ok(ExitCode::SUCCESS)
+        }
+        None => {
+            eprintln!("cairn: no manifest for key {key}");
