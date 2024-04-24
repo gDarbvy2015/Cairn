@@ -37,3 +37,6 @@ try {
     Write-Host "key = $key"
 
     Write-Host "`n==> Rust restores + verifies the Go-written manifest"
+    Remove-Item output.txt
+    & $cairn restore --key $key --out-dir .
+    & $cairn verify --key $key
