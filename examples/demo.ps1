@@ -40,3 +40,5 @@ try {
     Remove-Item output.txt
     & $cairn restore --key $key --out-dir .
     & $cairn verify --key $key
+    Write-Host 'manifest:'
+    & $cairn show --key $key
