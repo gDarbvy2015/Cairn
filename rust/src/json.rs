@@ -319,3 +319,26 @@ impl<'a> Parser<'a> {
         self.pos += 1; // consume '{'
         let mut entries: Vec<(String, Json)> = Vec::new();
         self.skip_ws();
+        if self.peek() == Some(b'}') {
+            self.pos += 1;
+            return Ok(Json::Object(entries));
+        }
+        loop {
+            self.skip_ws();
+            if self.peek() != Some(b'"') {
+                return Err(self.err("expected string key in object"));
+            }
+            let key = self.parse_string()?;
+            self.skip_ws();
+            if self.peek() != Some(b':') {
+                return Err(self.err("expected ':' after object key"));
+            }
+            self.pos += 1;
+            let value = self.parse_value()?;
+            entries.push((key, value));
+            self.skip_ws();
+            match self.peek() {
+                Some(b',') => {
+                    self.pos += 1;
+                }
+                Some(b'}') => {
