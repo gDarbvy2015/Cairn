@@ -38,3 +38,7 @@ func (h *Hasher) Update(b []byte) {
 	}
 	h.state = state
 }
+
+// Sum returns the raw 64-bit digest.
+func (h *Hasher) Sum() uint64 { return h.state }
+
