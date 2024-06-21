@@ -234,3 +234,15 @@ func execCommand(opts options) (int, error) {
 	}
 	return exitError, fmt.Errorf("running %q: %w", strings.Join(opts.command, " "), err)
 }
+
+func cmdHash(files []string) error {
+	if len(files) == 0 {
+		return fmt.Errorf("hash: expected one or more file paths")
+	}
+	for _, f := range files {
+		digest, size, err := cache.HashFile(f)
+		if err != nil {
+			return fmt.Errorf("%s: %w", f, err)
+		}
+		fmt.Printf("%s  %10d  %s\n", digest, size, f)
+	}
