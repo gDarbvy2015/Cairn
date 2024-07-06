@@ -199,3 +199,14 @@ func runWrapped(opts options) (int, error) {
 
 	outputs, err := store.StoreOutputs(opts.baseDir, opts.outputs)
 	if err != nil {
+		return exitError, err
+	}
+	manifest := &cache.Manifest{
+		Version:  cache.FormatVersion,
+		Producer: producer,
+		Key:      key,
+		Command:  opts.command,
+		Inputs:   inputs,
+		Outputs:  outputs,
+	}
+	if err := store.PutManifest(manifest); err != nil {
