@@ -71,3 +71,8 @@
 
   <!-- strata -->
   <g>
+    <rect x="0" y="120" width="880" height="66" fill="url(#rock1)"/>
+    <path d="M0,120 Q220,132 440,122 T880,124 L880,120 Z" fill="#e6b85a" opacity=".5"/>
+    <text x="28" y="150" class="lbl">objects/aa/: sandstone seam</text>
+    <text x="620" y="150" class="dig pulse">aabb2e94eeb35126</text>
+
