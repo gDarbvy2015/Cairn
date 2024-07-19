@@ -51,3 +51,7 @@ func HashBytes(b []byte) string {
 	h.Update(b)
 	return h.Hex()
 }
+
+// HashFile streams a file through the hasher, returning digest and size.
+func HashFile(path string) (string, uint64, error) {
+	f, err := os.Open(path)
