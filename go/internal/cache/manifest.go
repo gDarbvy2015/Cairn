@@ -112,3 +112,10 @@ func writeEntryArray(b *strings.Builder, entries []Entry) {
 		}
 		b.WriteByte('{')
 		writeKey(b, "path")
+		writeJSONString(b, e.Path)
+		b.WriteByte(',')
+		writeKey(b, "digest")
+		writeJSONString(b, e.Digest)
+		b.WriteByte(',')
+		writeKey(b, "size")
+		b.WriteString(strconv.FormatUint(e.Size, 10))
