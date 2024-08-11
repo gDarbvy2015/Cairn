@@ -29,3 +29,5 @@ try {
 
     Write-Host "`n==> Delete output, run again (expect cache HIT, command skipped)"
     Remove-Item output.txt
+    & $run --verbose --input input.txt --output output.txt -- powershell -NoProfile -Command "(Get-Content input.txt).ToUpper() | Set-Content output.txt -NoNewline"
+    Write-Host "output.txt restored: $(Get-Content output.txt)"
