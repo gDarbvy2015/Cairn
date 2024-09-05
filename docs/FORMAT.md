@@ -115,3 +115,11 @@ Relative to the cache root (default `.cairn-cache`):
   manifests/<key>.json        canonical manifest, one file per key
 ```
 
+- Blobs are content-addressed and therefore automatically deduplicated: two
+  outputs with identical bytes share one blob.
+- Writes are atomic: content is written to a `.tmp` sibling and renamed into
+  place.
+
+## 5. Verification
+
+Verifying a key means:
