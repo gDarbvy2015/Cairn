@@ -53,3 +53,6 @@
   <text x="38" y="296" class="ln l6"><tspan class="ice">1 ok, 0 missing, 0 corrupt, key_matches=true</tspan></text>
   <text x="38" y="316" class="ln l6"><tspan class="hit">OK: cache is healthy</tspan></text>
   <text x="38" y="344"><tspan class="amber">$</tspan> <tspan class="txt cur">▋</tspan></text>
+
+  <!-- ledger panel -->
+  <rect x="540" y="20" width="260" height="360" rx="8" fill="#f4ede0" stroke="#c68a2e"/>
