@@ -246,3 +246,15 @@ func cmdHash(files []string) error {
 		}
 		fmt.Printf("%s  %10d  %s\n", digest, size, f)
 	}
+	return nil
+}
+
+func usage(w *os.File) {
+	fmt.Fprintf(w, `cairn-run %s — Cairn command-execution wrapper
+
+USAGE:
+    cairn-run [options] -- <command> [args...]
+    cairn-run hash <file>...
+    cairn-run version
+
+OPTIONS:
