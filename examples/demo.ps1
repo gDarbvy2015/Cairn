@@ -42,3 +42,5 @@ try {
     & $cairn verify --key $key
     Write-Host 'manifest:'
     & $cairn show --key $key
+
+    Write-Host "`n==> Demo complete."
