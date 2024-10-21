@@ -36,3 +36,6 @@ test-go: ## Run Go tests
 
 fmt: ## Format both codebases
 	cd rust && cargo fmt
+	cd go && gofmt -w .
+
+vet: ## Static checks
