@@ -1,5 +1,9 @@
 import Foundation
 
+#if canImport(FoundationNetworking)
+  import FoundationNetworking
+#endif
+
 /// Represents options for an HTTP request.
 public struct RequestOptions: @unchecked Sendable {
   /// The HTTP method for the request (e.g., "GET", "POST", "PUT", etc.).
@@ -95,59 +99,90 @@ public struct Response: Sendable {
   /// - Returns: The decoded object of type `T`.
   /// - Throws: An error if decoding fails.
   public func json<T: Decodable & Sendable>(
-    as type: T.Type,
+    as type: T.Type = T.self,
     decoder: JSONDecoder? = nil
   ) async throws -> T {
-    try await Task.detached {
-      try (decoder ?? Fetch.decoder).decode(type, from: body)
-    }.value
+    if T.self is Data.Type {
+      return self.body as! T
+    } else if T.self is String.Type {
+      return await self.text() as! T
+    } else {
+      return try await Task.detached {
+        try (decoder ?? Fetch.decoder).decode(type, from: body)
+      }.value
+    }
   }
 }
 
 /// A global instance of `Fetch` for convenience.
 public let fetch = Fetch()
 
-/// A structure for making HTTP requests.
-public struct Fetch: Sendable {
+/// A type for making HTTP requests with an intuitive API inspired by the web Fetch API.
+public actor Fetch {
+  /// Configuration options for the Fetch instance.
+  public struct Configuration {
+    /// The URLSessionConfiguration to use for network requests.
+    public var sessionConfiguration: URLSessionConfiguration
+    /// An optional URLSessionDelegate for advanced session management.
+    public var sessionDelegate: URLSessionDelegate?
+    /// An optional OperationQueue for handling delegate calls.
+    public var sessionDelegateQueue: OperationQueue?
+    /// The JSONEncoder to use for encoding request bodies.
+    public var encoder: JSONEncoder
+
+    /// The default configuration.
+    public static var `default`: Configuration {
+      Configuration(sessionConfiguration: .default, encoder: Fetch.encoder)
+    }
+  }
+
   /// The `URLSession` used for making network requests.
   let session: URLSession
 
   /// The `JSONEncoder` used for encoding request bodies.
   let encoder: JSONEncoder
 
-  /// Initializes a new `Fetch` instance.
-  /// - Parameters:
-  ///   - session: The `URLSession` to use for requests. Defaults to `.shared`.
-  ///   - encoder: The `JSONEncoder` to use for encoding request bodies. Defaults to `Fetch.encoder`.
-  public init(session: URLSession = .shared, encoder: JSONEncoder = Fetch.encoder) {
-    self.session = session
-    self.encoder = encoder
+  /// Initializes a new `Fetch` instance with the given configuration.
+  /// - Parameter configuration: The configuration to use for this Fetch instance.
+  ///
+  /// Example:
+  /// ```swift
+  /// let customConfig = Fetch.Configuration(sessionConfiguration: .ephemeral, encoder: JSONEncoder())
+  /// let customFetch = Fetch(configuration: customConfig)
+  /// ```
+  public init(configuration: Configuration = .default) {
+    self.session = URLSession(
+      configuration: configuration.sessionConfiguration,
+      delegate: configuration.sessionDelegate,
+      delegateQueue: configuration.sessionDelegateQueue ?? .serial()
+    )
+    self.encoder = configuration.encoder
   }
-
-  /// Lock for synchronizing access to global static variables.
-  private static let staticLock = NSLock()
-
-  nonisolated(unsafe) private static var _encoder = JSONEncoder()
-  nonisolated(unsafe) private static var _decoder = JSONDecoder()
 
   /// The global `JSONEncoder` instance used by `Fetch`.
-  public static var encoder: JSONEncoder {
-    get { staticLock.withLock { _encoder } }
-    set { staticLock.withLock { _encoder = newValue } }
-  }
+  public static var encoder = JSONEncoder()
 
   /// The global `JSONDecoder` instance used by `Fetch`.
-  public static var decoder: JSONDecoder {
-    get { staticLock.withLock { _decoder } }
-    set { staticLock.withLock { _decoder = newValue } }
-  }
+  public static var decoder = JSONDecoder()
 
-  /// Performs an HTTP request.
+  /// Performs an HTTP request with a string URL.
   /// - Parameters:
   ///   - url: The URL string for the request.
   ///   - options: Optional `RequestOptions` for the request.
   /// - Returns: A `Response` object.
   /// - Throws: An error if the request fails or if the URL is invalid.
+  ///
+  /// Example:
+  /// ```swift
+  /// do {
+  ///     let response = try await fetch("https://api.example.com/data")
+  ///     print("Status: \(response.status)")
+  ///     let data: MyDataType = try await response.json()
+  ///     print("Received data: \(data)")
+  /// } catch {
+  ///     print("Error: \(error)")
+  /// }
+  /// ```
   @discardableResult
   public func callAsFunction(
     _ url: String,
@@ -156,12 +191,26 @@ public struct Fetch: Sendable {
     try await self.callAsFunction(URL(string: url)!, options: options)
   }
 
-  /// Performs an HTTP request.
+  /// Performs an HTTP request with a URL object.
   /// - Parameters:
   ///   - url: The URL for the request.
   ///   - options: Optional `RequestOptions` for the request.
   /// - Returns: A `Response` object.
   /// - Throws: An error if the request fails.
+  ///
+  /// Example:
+  /// ```swift
+  /// let url = URL(string: "https://api.example.com/data")!
+  /// let options = RequestOptions(method: "POST", body: ["key": "value"])
+  /// do {
+  ///     let response = try await fetch(url, options: options)
+  ///     print("Status: \(response.status)")
+  ///     let responseText = await response.text()
+  ///     print("Response: \(responseText)")
+  /// } catch {
+  ///     print("Error: \(error)")
+  /// }
+  /// ```
   @discardableResult
   public func callAsFunction(
     _ url: URL,
@@ -170,21 +219,51 @@ public struct Fetch: Sendable {
     try await self.callAsFunction(Request(url: url, options: options))
   }
 
-  /// Performs an HTTP request.
+  /// Performs an HTTP request using a Request object.
   /// - Parameter request: The `Request` object containing the URL and options.
   /// - Returns: A `Response` object.
   /// - Throws: An error if the request fails or if the response is not an HTTP response.
+  ///
+  /// Example:
+  /// ```swift
+  /// let request = Request(url: "https://api.example.com/upload", options: RequestOptions(method: "POST", body: FormData()))
+  /// do {
+  ///     let response = try await fetch(request)
+  ///     if response.ok {
+  ///         print("Upload successful")
+  ///     } else {
+  ///         print("Upload failed with status: \(response.status)")
+  ///     }
+  /// } catch {
+  ///     print("Error: \(error)")
+  /// }
+  /// ```
   @discardableResult
   public func callAsFunction(_ request: Request) async throws -> Response {
     var urlRequest = URLRequest(url: request.url)
     urlRequest.httpMethod = request.options?.method
     urlRequest.allHTTPHeaderFields = request.options?.headers
 
-    if let body = request.options?.body {
-      try encode(body, in: &urlRequest)
-    }
+    let data: Data
+    let response: URLResponse
 
-    let (data, response) = try await session.data(for: urlRequest)
+    if let body = request.options?.body {
+      if let url = body as? URL {
+        (data, response) = try await session.upload(for: urlRequest, fromFile: url)
+      } else {
+        let uploadData = try encode(body, in: &urlRequest)
+        if let uploadData {
+          (data, response) = try await session.upload(for: urlRequest, from: uploadData)
+        } else if urlRequest.httpBodyStream != nil {
+          (data, response) = try await session.data(for: urlRequest)
+        } else {
+          // TODO: throw another error
+          throw URLError(.badServerResponse)
+        }
+      }
+    } else {
+      (data, response) = try await session.data(for: urlRequest)
+    }
 
     guard let httpRespnse = response as? HTTPURLResponse else {
       throw URLError(.badServerResponse)
@@ -203,43 +282,47 @@ public struct Fetch: Sendable {
   ///   - value: The value to encode as the request body.
   ///   - request: The `URLRequest` to modify with the encoded body.
   /// - Throws: An error if encoding fails or if the value type is not supported.
-  private func encode(_ value: Any, in request: inout URLRequest) throws {
+  private func encode(_ value: Any, in request: inout URLRequest) throws -> Data? {
     switch value {
     case let data as Data:
-      request.httpBody = data
+      return data
 
     case let str as String:
-      request.httpBody = str.data(using: .utf8)!
+      return str.data(using: .utf8)!
 
     case let arr as [UInt8]:
-      request.httpBody = Data(arr)
+      return Data(arr)
 
     case let url as URL:
-      request.httpBody = try Data(contentsOf: url)
+      return try Data(contentsOf: url)
+
+    case let stream as InputStream:
+      request.httpBodyStream = stream
+      return nil
 
     case let formData as FormData:
-      request.httpBody = formData.encode()
       if request.value(forHTTPHeaderField: "Content-Type") == nil {
         request.setValue(formData.contentType, forHTTPHeaderField: "Content-Type")
       }
+      return formData.encode()
 
     case let searchParams as URLSearchParams:
-      request.httpBody = searchParams.description.data(using: .utf8)!
       if request.value(forHTTPHeaderField: "Content-Type") == nil {
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
       }
+      return searchParams.description.data(using: .utf8)!
 
     default:
       if JSONSerialization.isValidJSONObject(value) {
-        request.httpBody = try JSONSerialization.data(withJSONObject: value)
         if request.value(forHTTPHeaderField: "Content-Type") == nil {
           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
+        return try JSONSerialization.data(withJSONObject: value)
       } else if let value = value as? any Encodable {
-        request.httpBody = try encoder.encode(value)
         if request.value(forHTTPHeaderField: "Content-Type") == nil {
           request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         }
+        return try encoder.encode(value)
       } else {
         throw UnsupportedBodyTypeError(type: type(of: value))
       }
@@ -251,4 +334,12 @@ public struct Fetch: Sendable {
 public struct UnsupportedBodyTypeError: Error {
   /// The type of the unsupported body value.
   public let type: Any.Type
+}
+
+extension OperationQueue {
+  static func serial() -> OperationQueue {
+    let queue = OperationQueue()
+    queue.maxConcurrentOperationCount = 1
+    return queue
+  }
 }

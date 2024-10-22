@@ -1,21 +1,24 @@
 import Foundation
 
-/// A structure for creating multipart/form-data content.
+/// A structure for creating and encoding multipart/form-data content.
+/// This is commonly used for file uploads and complex form submissions in HTTP requests.
 public struct FormData: Sendable {
   private let boundary: String
   private var bodyParts: [BodyPart] = []
 
-  /// Initializes a new MultipartFormData instance with a random boundary.
+  /// Initializes a new FormData instance with a random boundary.
+  /// The boundary is used to separate different parts of the multipart form data.
   public init() {
-    self.boundary = "Boundary-\(UUID().uuidString)"
+    self.boundary = "dev.grds.fetch.boundary-\(UUID().uuidString)"
   }
 
   /// Adds a new part to the multipart form data.
   /// - Parameters:
   ///   - name: The name of the form field.
-  ///   - value: The value of the form field.
-  ///   - filename: An optional filename for file uploads.
-  ///   - contentType: An optional content type for the part.
+  ///   - value: The value of the form field. Can be a String, Data, or any other type.
+  ///   - filename: An optional filename for file uploads. If provided, it will be included in the Content-Disposition header.
+  ///   - contentType: An optional MIME type for the part. If provided, it will be included as a Content-Type header.
+  /// - Note: If the value is not a String or Data, it will be converted to a String using String(describing:).
   public mutating func append(
     _ name: String,
     _ value: Any,
@@ -27,17 +30,20 @@ public struct FormData: Sendable {
 
     switch value {
     case let string as String:
-      data = string.data(using: .utf8) ?? Data()
+      data = string.data(using: .utf8)!
     case let d as Data:
       data = d
     default:
-      data = String(describing: value).data(using: .utf8) ?? Data()
+      data = String(describing: value).data(using: .utf8)!
     }
 
     let bodyPart = BodyPart(headers: headers, data: data)
     bodyParts.append(bodyPart)
   }
 
+  /// Encodes the multipart form data into a single Data object.
+  /// This method combines all added parts with appropriate headers and boundaries.
+  /// - Returns: A Data object containing the encoded multipart form data.
   public func encode() -> Data {
     var data = Data()
 
@@ -56,8 +62,9 @@ public struct FormData: Sendable {
   }
 
   /// Returns the Content-Type header value for this multipart form data.
+  /// This should be used as the Content-Type header when sending the form data in an HTTP request.
   public var contentType: String {
-    return "multipart/form-data; boundary=\(boundary)"
+    "multipart/form-data; boundary=\(boundary)"
   }
 
   private func createHeaders(
