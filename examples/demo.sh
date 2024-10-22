@@ -46,3 +46,6 @@ rm -f output.txt
 echo "output.txt restored: $(cat output.txt)"
 
 echo
+echo "==> Cross-language: Rust computes the same key"
+key="$("$cairn" key --input input.txt -- sh -c 'tr a-z A-Z < input.txt > output.txt')"
+echo "key = $key"
