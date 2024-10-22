@@ -23,14 +23,15 @@ Add the following line to your `Package.swift` file:
 .package(url: "https://github.com/grdsdev/swift-fetch.git", from: "0.0.1")
 ```
 
+Then, add "Fetch" to your target dependencies.
+
 ## Usage
 
 ### Basic GET Request
 
-Then, add "Fetch" to your target dependencies.
-
 ```swift
 import Fetch
+
 let response = try await fetch("https://api.example.com/data")
 let data: SomeDecodableType = try await response.json()
 ```
@@ -55,13 +56,15 @@ let response = try await fetch(
 ```swift
 import Fetch
 
+var formData = FormData()
+formData.append("username", "johndoe")
+formData.append("avatar", imageData, filename: "avatar.jpg", contentType: "image/jpeg")
+
 let response = try await fetch(
   "https://api.example.com/upload", 
   options: RequestOptions(
     method: "POST", 
-    body: FormData()
-      .append("username", "johndoe")
-      .append("avatar", imageData, filename: "avatar.jpg", contentType: "image/jpeg")
+    body: formData
   )
 )
 ```
