@@ -15,26 +15,36 @@ public struct FormData: Sendable {
   /// Adds a new part to the multipart form data.
   /// - Parameters:
   ///   - name: The name of the form field.
-  ///   - value: The value of the form field. Can be a String, Data, or any other type.
+  ///   - value: The value of the form field. Can be a String, Data, URL, URLSearchParams, or any other type that can be encoded to Data.
   ///   - filename: An optional filename for file uploads. If provided, it will be included in the Content-Disposition header.
   ///   - contentType: An optional MIME type for the part. If provided, it will be included as a Content-Type header.
-  /// - Note: If the value is not a String or Data, it will be converted to a String using String(describing:).
+  /// - Throws: An error if the value cannot be converted to Data or if the value type is not supported.
   public mutating func append(
     _ name: String,
     _ value: Any,
     filename: String? = nil,
     contentType: String? = nil
-  ) {
+  ) throws {
     let headers = createHeaders(name: name, filename: filename, contentType: contentType)
     let data: Data
 
     switch value {
-    case let string as String:
-      data = string.data(using: .utf8)!
     case let d as Data:
       data = d
+    case let str as String:
+      data = Data(str.utf8)
+    case let url as URL:
+      data = try Data(contentsOf: url)
+    case let searchParams as URLSearchParams:
+      data = Data(searchParams.description.utf8)
     default:
-      data = String(describing: value).data(using: .utf8)!
+      if JSONSerialization.isValidJSONObject(value) {
+        data = try JSONSerialization.data(withJSONObject: value)
+      } else if let value = value as? any Encodable {
+        data = try Fetch.encoder.encode(value)
+      } else {
+        throw UnsupportedBodyTypeError(type: type(of: value))
+      }
     }
 
     let bodyPart = BodyPart(headers: headers, data: data)
