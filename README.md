@@ -284,3 +284,23 @@ To keep an honest ledger:
 What you *can* rely on structurally, without numbers: a hit's cost scales with
 **input hashing + output copy**, not with the original command's complexity;
 hashing is a single linear pass in 64&nbsp;KB chunks, so memory is bounded
+regardless of file size; and dedup means disk growth tracks *distinct* output
+bytes, not the number of cached steps. The bars in the illustration show the
+*shape* of a miss-versus-hit event, not a measurement — replace them with your
+own timings before you cite anything.
+
+## Field hazards — failure modes
+
+Know the terrain before you descend.
+
+| Hazard | What happens | Why |
+| ------ | ------------ | --- |
+| **Undeclared input changes** | Stale hit: old output restored. | The key sees only inputs you declared. Declare every real input. |
+| **Undeclared output produced** | Not cached; a later hit won't restore it. | Only `--output` files are captured. |
+| **Pruned or corrupted blob** | Surveyor re-runs; `verify` reports `missing`/`corrupt`. | Restore checks presence; verify re-hashes each blob. |
+| **Non-zero command exit** | Nothing cached; exit code propagated. | Failed builds must never masquerade as hits. |
+| **Manifest tampering** | `verify` reports `key_matches=false`. | Verify recomputes the key from the manifest's own inputs+command. |
+| **Hash collision (adversarial)** | Possible — FNV-1a isn't collision-resistant. | See the honest caveat. Not a trust boundary. |
+
+`cairn verify --key <k>` is your integrity probe: it checks that every
+referenced blob exists, that each blob still hashes to its recorded digest, and
