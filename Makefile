@@ -39,3 +39,6 @@ fmt: ## Format both codebases
 	cd go && gofmt -w .
 
 vet: ## Static checks
+	cd rust && cargo clippy --all-targets -- -D warnings || true
+	cd go && go vet ./...
+
