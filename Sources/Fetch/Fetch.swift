@@ -86,10 +86,8 @@ public struct Response: Sendable {
 
   /// Converts the response body to a string.
   /// - Returns: The response body as a UTF-8 encoded string.
-  public func text() async -> String {
-    await Task.detached {
-      String(decoding: body, as: UTF8.self)
-    }.value
+  public func text() -> String {
+    String(decoding: body, as: UTF8.self)
   }
 
   /// Decodes the response body to a specified type.
@@ -101,15 +99,13 @@ public struct Response: Sendable {
   public func json<T: Decodable & Sendable>(
     as type: T.Type = T.self,
     decoder: JSONDecoder? = nil
-  ) async throws -> T {
+  ) throws -> T {
     if T.self is Data.Type {
       return self.body as! T
     } else if T.self is String.Type {
-      return await self.text() as! T
+      return self.text() as! T
     } else {
-      return try await Task.detached {
-        try (decoder ?? Fetch.decoder).decode(type, from: body)
-      }.value
+      return try (decoder ?? Fetch.decoder).decode(type, from: body)
     }
   }
 }
