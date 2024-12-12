@@ -5,13 +5,15 @@ import Testing
 
 @Test func decodeStringResponse() async throws {
   let stringResponse = Response(
-    url: URL(string: "https://api.example.com/data")!, body: "string value".data(using: .utf8)!,
-    headers: [:], status: 200)
+    url: URL(string: "https://api.example.com/data")!,
+    body: "string value".data(using: .utf8)!,
+    headers: [:],
+    status: 200
+  )
 
-  #expect(await stringResponse.text() == "string value")
-  try #expect(await stringResponse.json() as String == "string value")
-  try #expect(await stringResponse.json() as Data == Data("string value".utf8))
-
+  #expect(stringResponse.text() == "string value")
+  try #expect(stringResponse.decode() as String == "string value")
+  try #expect(stringResponse.decode() as Data == Data("string value".utf8))
 }
 
 @Test func decodeJSONResponse() async throws {
@@ -26,6 +28,6 @@ import Testing
     status: 200
   )
 
-  let json = try await response.json() as JSON
+  let json = try response.decode() as JSON
   #expect(json.value == "string value")
 }

@@ -9,7 +9,9 @@ public struct FormData: Sendable {
   /// Initializes a new FormData instance with a random boundary.
   /// The boundary is used to separate different parts of the multipart form data.
   public init() {
-    self.boundary = "dev.grds.fetch.boundary-\(UUID().uuidString)"
+    let first = UInt32.random(in: UInt32.min...UInt32.max)
+    let second = UInt32.random(in: UInt32.min...UInt32.max)
+    self.boundary = String(format: "dev.grds.fetch.boundary.%08x%08x", first, second)
   }
 
   /// Adds a new part to the multipart form data.

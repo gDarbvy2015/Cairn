@@ -96,7 +96,7 @@ public struct Response: Sendable {
   ///   - decoder: The JSON decoder to use. Defaults to global `Fetch.decoder`.
   /// - Returns: The decoded object of type `T`.
   /// - Throws: An error if decoding fails.
-  public func json<T: Decodable & Sendable>(
+  public func decode<T: Decodable & Sendable>(
     as type: T.Type = T.self,
     decoder: JSONDecoder? = nil
   ) throws -> T {
@@ -108,59 +108,22 @@ public struct Response: Sendable {
       return try (decoder ?? Fetch.decoder).decode(type, from: body)
     }
   }
+
+  /// Decodes the response body as a JSON.
+  public func json() throws -> Any {
+    try JSONSerialization.jsonObject(with: body)
+  }
+}
+
+public protocol Fetcher: Sendable {
+  @discardableResult
+  func callAsFunction(_ request: Request) async throws -> Response
 }
 
 /// A global instance of `Fetch` for convenience.
 public let fetch = Fetch()
 
-/// A type for making HTTP requests with an intuitive API inspired by the web Fetch API.
-public actor Fetch {
-  /// Configuration options for the Fetch instance.
-  public struct Configuration {
-    /// The URLSessionConfiguration to use for network requests.
-    public var sessionConfiguration: URLSessionConfiguration
-    /// An optional URLSessionDelegate for advanced session management.
-    public var sessionDelegate: URLSessionDelegate?
-    /// An optional OperationQueue for handling delegate calls.
-    public var sessionDelegateQueue: OperationQueue?
-    /// The JSONEncoder to use for encoding request bodies.
-    public var encoder: JSONEncoder
-
-    /// The default configuration.
-    public static var `default`: Configuration {
-      Configuration(sessionConfiguration: .default, encoder: Fetch.encoder)
-    }
-  }
-
-  /// The `URLSession` used for making network requests.
-  let session: URLSession
-
-  /// The `JSONEncoder` used for encoding request bodies.
-  let encoder: JSONEncoder
-
-  /// Initializes a new `Fetch` instance with the given configuration.
-  /// - Parameter configuration: The configuration to use for this Fetch instance.
-  ///
-  /// Example:
-  /// ```swift
-  /// let customConfig = Fetch.Configuration(sessionConfiguration: .ephemeral, encoder: JSONEncoder())
-  /// let customFetch = Fetch(configuration: customConfig)
-  /// ```
-  public init(configuration: Configuration = .default) {
-    self.session = URLSession(
-      configuration: configuration.sessionConfiguration,
-      delegate: configuration.sessionDelegate,
-      delegateQueue: configuration.sessionDelegateQueue ?? .serial()
-    )
-    self.encoder = configuration.encoder
-  }
-
-  /// The global `JSONEncoder` instance used by `Fetch`.
-  public static var encoder = JSONEncoder()
-
-  /// The global `JSONDecoder` instance used by `Fetch`.
-  public static var decoder = JSONDecoder()
-
+extension Fetcher {
   /// Performs an HTTP request with a string URL.
   /// - Parameters:
   ///   - url: The URL string for the request.
@@ -214,6 +177,55 @@ public actor Fetch {
   ) async throws -> Response {
     try await self.callAsFunction(Request(url: url, options: options))
   }
+}
+
+/// A type for making HTTP requests with an intuitive API inspired by the web Fetch API.
+public actor Fetch: Fetcher {
+  /// Configuration options for the Fetch instance.
+  public struct Configuration {
+    /// The `URLSessionConfiguration` to use for network requests.
+    public var sessionConfiguration: URLSessionConfiguration
+    /// An optional `URLSessionDelegate` for advanced session management.
+    public var sessionDelegate: URLSessionDelegate?
+    /// An optional `OperationQueue` for handling delegate calls.
+    public var sessionDelegateQueue: OperationQueue?
+    /// The `JSONEncoder` to use for encoding request bodies.
+    public var encoder: JSONEncoder
+
+    /// The default configuration.
+    public static var `default`: Configuration {
+      Configuration(sessionConfiguration: .default, encoder: Fetch.encoder)
+    }
+  }
+
+  /// The `URLSession` used for making network requests.
+  let session: URLSession
+
+  /// The `JSONEncoder` used for encoding request bodies.
+  let encoder: JSONEncoder
+
+  /// Initializes a new `Fetch` instance with the given configuration.
+  /// - Parameter configuration: The configuration to use for this Fetch instance.
+  ///
+  /// Example:
+  /// ```swift
+  /// let customConfig = Fetch.Configuration(sessionConfiguration: .ephemeral, encoder: JSONEncoder())
+  /// let customFetch = Fetch(configuration: customConfig)
+  /// ```
+  public init(configuration: Configuration = .default) {
+    self.session = URLSession(
+      configuration: configuration.sessionConfiguration,
+      delegate: configuration.sessionDelegate,
+      delegateQueue: configuration.sessionDelegateQueue ?? .serial()
+    )
+    self.encoder = configuration.encoder
+  }
+
+  /// The global `JSONEncoder` instance used by `Fetch`.
+  public static var encoder = JSONEncoder()
+
+  /// The global `JSONDecoder` instance used by `Fetch`.
+  public static var decoder = JSONDecoder()
 
   /// Performs an HTTP request using a Request object.
   /// - Parameter request: The `Request` object containing the URL and options.
@@ -253,8 +265,7 @@ public actor Fetch {
         } else if urlRequest.httpBodyStream != nil {
           (data, response) = try await session.data(for: urlRequest)
         } else {
-          // TODO: throw another error
-          throw URLError(.badServerResponse)
+          throw BadRequestError()
         }
       }
     } else {
@@ -325,6 +336,8 @@ public actor Fetch {
     }
   }
 }
+
+public struct BadRequestError: Error {}
 
 /// An error thrown when an unsupported body type is provided for the request.
 public struct UnsupportedBodyTypeError: Error {

@@ -16,15 +16,18 @@ import Testing
 
 @Test func testAppendDataValue() throws {
   var formData = FormData()
-  let imageData = Data([0xFF, 0xD8, 0xFF, 0xE0])  // Mock JPEG data
+  let imageData = Data([0xFF, 0xD8, 0xFF, 0xE0]).base64EncodedData()  // Mock JPEG data
   try formData.append("image", imageData, filename: "test.jpg", contentType: "image/jpeg")
 
   let encodedData = formData.encode()
-  let encodedString = String(data: encodedData, encoding: .utf8)!
+  let encodedString = String(decoding: encodedData, as: UTF8.self)
+
+  let expectedImageData = String(decoding: imageData, as: UTF8.self)
 
   #expect(encodedString.contains("name=\"image\""))
   #expect(encodedString.contains("filename=\"test.jpg\""))
   #expect(encodedString.contains("Content-Type: image/jpeg"))
+  #expect(encodedString.contains(expectedImageData))
 }
 
 @Test func testAppendMultipleValues() throws {
