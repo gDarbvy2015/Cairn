@@ -9,3 +9,4 @@ Cargo.lock
 *.test
 *.out
 
+# Cairn caches created by demos/tests
