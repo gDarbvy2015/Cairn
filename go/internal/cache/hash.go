@@ -60,3 +60,7 @@ func HashFile(path string) (string, uint64, error) {
 	}
 	defer f.Close()
 
+	h := NewHasher()
+	buf := make([]byte, 64*1024)
+	var total uint64
+	for {
