@@ -65,8 +65,8 @@ public struct Response: Sendable {
   /// The URL of the response.
   public let url: URL
 
-  /// The body of the response as raw data.
-  public let body: Data
+  /// The body of the response.
+  public let body: Body
 
   /// A dictionary of HTTP headers received in the response.
   public let headers: [String: String]
@@ -86,8 +86,8 @@ public struct Response: Sendable {
 
   /// Converts the response body to a string.
   /// - Returns: The response body as a UTF-8 encoded string.
-  public func text() -> String {
-    String(decoding: body, as: UTF8.self)
+  public func text() async -> String {
+    await String(decoding: body.collect(), as: UTF8.self)
   }
 
   /// Decodes the response body to a specified type.
@@ -99,25 +99,86 @@ public struct Response: Sendable {
   public func decode<T: Decodable & Sendable>(
     as type: T.Type = T.self,
     decoder: JSONDecoder? = nil
-  ) throws -> T {
+  ) async throws -> T {
     if T.self is Data.Type {
-      return self.body as! T
+      return await body.collect() as! T
     } else if T.self is String.Type {
-      return self.text() as! T
+      return await self.text() as! T
     } else {
-      return try (decoder ?? Fetch.decoder).decode(type, from: body)
+      return try await (decoder ?? Fetch.decoder).decode(type, from: body.collect())
     }
   }
 
   /// Decodes the response body as a JSON.
-  public func json() throws -> Any {
-    try JSONSerialization.jsonObject(with: body)
+  public func json() async throws -> Any {
+    try await JSONSerialization.jsonObject(with: body.collect())
+  }
+
+  public struct Body: AsyncSequence, Sendable {
+    public typealias AsyncIterator = AsyncStream<Data>.Iterator
+    public typealias Element = Data
+    public typealias Failure = Never
+
+    let stream: AsyncStream<Data>
+    let continuation: AsyncStream<Data>.Continuation
+
+    init() {
+      (stream, continuation) = AsyncStream.makeStream()
+    }
+
+    public func makeAsyncIterator() -> AsyncIterator {
+      stream.makeAsyncIterator()
+    }
+
+    public func collect() async -> Data {
+      await stream.reduce(into: Data()) { $0 += $1 }
+    }
+
+    func append(_ data: Data) {
+      continuation.yield(data)
+    }
+
+    func finalize() {
+      continuation.finish()
+    }
+  }
+
+}
+extension Response.Body {
+  public static func string(_ string: String, using encoding: String.Encoding = .utf8) -> Self {
+    let body = Self()
+    body.append(string.data(using: encoding)!)
+    body.finalize()
+    return body
+  }
+
+  public static func data(_ data: Data) -> Self {
+    let body = Self()
+    body.append(data)
+    body.finalize()
+    return body
+  }
+
+  public static func bytes(_ bytes: [UInt8]) -> Self {
+    .data(Data(bytes))
   }
 }
 
 public protocol Fetcher: Sendable {
   @discardableResult
-  func callAsFunction(_ request: Request) async throws -> Response
+  func callAsFunction(
+    _ request: Request,
+    onUploadProgress: (@Sendable (Progress) -> Void)?
+  ) async throws -> Response
+}
+
+extension Fetcher {
+  @discardableResult
+  public func callAsFunction(
+    _ request: Request
+  ) async throws -> Response {
+    try await callAsFunction(request, onUploadProgress: nil)
+  }
 }
 
 /// A global instance of `Fetch` for convenience.
@@ -145,9 +206,14 @@ extension Fetcher {
   @discardableResult
   public func callAsFunction(
     _ url: String,
-    options: RequestOptions? = nil
+    options: RequestOptions? = nil,
+    onUploadProgress: (@Sendable (Progress) -> Void)? = nil
   ) async throws -> Response {
-    try await self.callAsFunction(URL(string: url)!, options: options)
+    try await self.callAsFunction(
+      URL(string: url)!,
+      options: options,
+      onUploadProgress: onUploadProgress
+    )
   }
 
   /// Performs an HTTP request with a URL object.
@@ -173,9 +239,13 @@ extension Fetcher {
   @discardableResult
   public func callAsFunction(
     _ url: URL,
-    options: RequestOptions? = nil
+    options: RequestOptions? = nil,
+    onUploadProgress: (@Sendable (Progress) -> Void)? = nil
   ) async throws -> Response {
-    try await self.callAsFunction(Request(url: url, options: options))
+    try await self.callAsFunction(
+      Request(url: url, options: options),
+      onUploadProgress: onUploadProgress
+    )
   }
 }
 
@@ -204,6 +274,8 @@ public actor Fetch: Fetcher {
   /// The `JSONEncoder` used for encoding request bodies.
   let encoder: JSONEncoder
 
+  let dataLoader = DataLoader()
+
   /// Initializes a new `Fetch` instance with the given configuration.
   /// - Parameter configuration: The configuration to use for this Fetch instance.
   ///
@@ -215,10 +287,12 @@ public actor Fetch: Fetcher {
   public init(configuration: Configuration = .default) {
     self.session = URLSession(
       configuration: configuration.sessionConfiguration,
-      delegate: configuration.sessionDelegate,
+      delegate: dataLoader,
       delegateQueue: configuration.sessionDelegateQueue ?? .serial()
     )
     self.encoder = configuration.encoder
+
+    dataLoader.userSessionDelegate = configuration.sessionDelegate
   }
 
   /// The global `JSONEncoder` instance used by `Fetch`.
@@ -247,41 +321,42 @@ public actor Fetch: Fetcher {
   /// }
   /// ```
   @discardableResult
-  public func callAsFunction(_ request: Request) async throws -> Response {
+  public func callAsFunction(
+    _ request: Request,
+    onUploadProgress: (@Sendable (Progress) -> Void)? = nil
+  ) async throws -> Response {
     var urlRequest = URLRequest(url: request.url)
     urlRequest.httpMethod = request.options?.method
     urlRequest.allHTTPHeaderFields = request.options?.headers
 
-    let data: Data
-    let response: URLResponse
-
     if let body = request.options?.body {
       if let url = body as? URL {
-        (data, response) = try await session.upload(for: urlRequest, fromFile: url)
+        let task = session.uploadTask(with: urlRequest, fromFile: url)
+        return try await dataLoader.startUploadTask(
+          task, session: session, delegate: nil, onUploadProgress: onUploadProgress)
       } else {
         let uploadData = try encode(body, in: &urlRequest)
         if let uploadData {
-          (data, response) = try await session.upload(for: urlRequest, from: uploadData)
+          let task = session.uploadTask(with: urlRequest, from: uploadData)
+          return try await dataLoader.startUploadTask(
+            task, session: session, delegate: nil, onUploadProgress: onUploadProgress)
         } else if urlRequest.httpBodyStream != nil {
-          (data, response) = try await session.data(for: urlRequest)
+          let task = session.dataTask(with: urlRequest)
+          return try await dataLoader.startDataTask(
+            task,
+            session: session,
+            delegate: nil,
+            onUploadProgress: onUploadProgress
+          )
         } else {
-          throw BadRequestError()
+          fatalError("Bad request")
         }
       }
     } else {
-      (data, response) = try await session.data(for: urlRequest)
+      let task = session.dataTask(with: urlRequest)
+      return try await dataLoader.startDataTask(
+        task, session: session, delegate: nil, onUploadProgress: onUploadProgress)
     }
-
-    guard let httpRespnse = response as? HTTPURLResponse else {
-      throw URLError(.badServerResponse)
-    }
-
-    return Response(
-      url: httpRespnse.url!,
-      body: data,
-      headers: httpRespnse.allHeaderFields as? [String: String] ?? [:],
-      status: httpRespnse.statusCode
-    )
   }
 
   /// Encodes the request body based on its type.
@@ -337,8 +412,6 @@ public actor Fetch: Fetcher {
   }
 }
 
-public struct BadRequestError: Error {}
-
 /// An error thrown when an unsupported body type is provided for the request.
 public struct UnsupportedBodyTypeError: Error {
   /// The type of the unsupported body value.
@@ -350,5 +423,26 @@ extension OperationQueue {
     let queue = OperationQueue()
     queue.maxConcurrentOperationCount = 1
     return queue
+  }
+}
+
+public struct Progress {
+  public var totalUnitCount: Int64
+  public var sentUnitCount: Int64
+
+  public var fractionCompleted: Double {
+    Double(sentUnitCount) / Double(totalUnitCount)
+  }
+}
+
+final class _Delegate: NSObject, URLSessionTaskDelegate {
+  private let didCompleteTask: (@Sendable (URLSession, URLSessionTask) -> Void)?
+
+  init(didCompleteTask: (@Sendable (URLSession, URLSessionTask) -> Void)?) {
+    self.didCompleteTask = didCompleteTask
+  }
+
+  func urlSession(_ session: URLSession, didCompleteTask task: URLSessionTask) {
+    didCompleteTask?(session, task)
   }
 }

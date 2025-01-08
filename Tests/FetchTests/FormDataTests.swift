@@ -57,7 +57,8 @@ import Testing
   let encodedString = String(data: encodedData, encoding: .utf8)!
 
   #expect(encodedString.contains("name=\"custom\""))
-  #expect(encodedString.contains(#"{"id":123,"name":"Test"}"#))
+  #expect(encodedString.contains(#""id":123"#))
+  #expect(encodedString.contains(#""name":"Test"#))
 }
 
 @Test func testEncodingWithURLSearchParams() throws {

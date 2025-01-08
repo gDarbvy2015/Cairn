@@ -3,17 +3,37 @@ import Testing
 
 @testable import Fetch
 
-@Test func decodeStringResponse() async throws {
+@Test func textResponse() async throws {
   let stringResponse = Response(
     url: URL(string: "https://api.example.com/data")!,
-    body: "string value".data(using: .utf8)!,
+    body: .string("string value"),
     headers: [:],
     status: 200
   )
 
-  #expect(stringResponse.text() == "string value")
-  try #expect(stringResponse.decode() as String == "string value")
-  try #expect(stringResponse.decode() as Data == Data("string value".utf8))
+  #expect(await stringResponse.text() == "string value")
+}
+
+@Test func decodeStringResponse() async throws {
+  let stringResponse = Response(
+    url: URL(string: "https://api.example.com/data")!,
+    body: .string("string value"),
+    headers: [:],
+    status: 200
+  )
+
+  try #expect(await stringResponse.decode() as String == "string value")
+}
+
+@Test func decodeDataResponse() async throws {
+  let stringResponse = Response(
+    url: URL(string: "https://api.example.com/data")!,
+    body: .string("string value"),
+    headers: [:],
+    status: 200
+  )
+
+  try #expect(await stringResponse.decode() as Data == Data("string value".utf8))
 }
 
 @Test func decodeJSONResponse() async throws {
@@ -23,11 +43,11 @@ import Testing
 
   let response = Response(
     url: URL(string: "https://api.example.com/data")!,
-    body: #"{ "value": "string value" }"#.data(using: .utf8)!,
+    body: .string(#"{ "value": "string value" }"#),
     headers: [:],
     status: 200
   )
 
-  let json = try response.decode() as JSON
+  let json = try await response.decode() as JSON
   #expect(json.value == "string value")
 }
