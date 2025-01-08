@@ -167,18 +167,8 @@ extension Response.Body {
 public protocol Fetcher: Sendable {
   @discardableResult
   func callAsFunction(
-    _ request: Request,
-    onUploadProgress: (@Sendable (Progress) -> Void)?
-  ) async throws -> Response
-}
-
-extension Fetcher {
-  @discardableResult
-  public func callAsFunction(
     _ request: Request
-  ) async throws -> Response {
-    try await callAsFunction(request, onUploadProgress: nil)
-  }
+  ) async throws -> Response
 }
 
 /// A global instance of `Fetch` for convenience.
@@ -206,13 +196,11 @@ extension Fetcher {
   @discardableResult
   public func callAsFunction(
     _ url: String,
-    options: RequestOptions? = nil,
-    onUploadProgress: (@Sendable (Progress) -> Void)? = nil
+    options: RequestOptions? = nil
   ) async throws -> Response {
     try await self.callAsFunction(
       URL(string: url)!,
-      options: options,
-      onUploadProgress: onUploadProgress
+      options: options
     )
   }
 
@@ -239,12 +227,10 @@ extension Fetcher {
   @discardableResult
   public func callAsFunction(
     _ url: URL,
-    options: RequestOptions? = nil,
-    onUploadProgress: (@Sendable (Progress) -> Void)? = nil
+    options: RequestOptions? = nil
   ) async throws -> Response {
     try await self.callAsFunction(
-      Request(url: url, options: options),
-      onUploadProgress: onUploadProgress
+      Request(url: url, options: options)
     )
   }
 }
@@ -322,8 +308,7 @@ public actor Fetch: Fetcher {
   /// ```
   @discardableResult
   public func callAsFunction(
-    _ request: Request,
-    onUploadProgress: (@Sendable (Progress) -> Void)? = nil
+    _ request: Request
   ) async throws -> Response {
     var urlRequest = URLRequest(url: request.url)
     urlRequest.httpMethod = request.options?.method
@@ -333,20 +318,19 @@ public actor Fetch: Fetcher {
       if let url = body as? URL {
         let task = session.uploadTask(with: urlRequest, fromFile: url)
         return try await dataLoader.startUploadTask(
-          task, session: session, delegate: nil, onUploadProgress: onUploadProgress)
+          task, session: session, delegate: nil)
       } else {
         let uploadData = try encode(body, in: &urlRequest)
         if let uploadData {
           let task = session.uploadTask(with: urlRequest, from: uploadData)
           return try await dataLoader.startUploadTask(
-            task, session: session, delegate: nil, onUploadProgress: onUploadProgress)
+            task, session: session, delegate: nil)
         } else if urlRequest.httpBodyStream != nil {
           let task = session.dataTask(with: urlRequest)
           return try await dataLoader.startDataTask(
             task,
             session: session,
-            delegate: nil,
-            onUploadProgress: onUploadProgress
+            delegate: nil
           )
         } else {
           fatalError("Bad request")
@@ -355,7 +339,10 @@ public actor Fetch: Fetcher {
     } else {
       let task = session.dataTask(with: urlRequest)
       return try await dataLoader.startDataTask(
-        task, session: session, delegate: nil, onUploadProgress: onUploadProgress)
+        task,
+        session: session,
+        delegate: nil
+      )
     }
   }
 

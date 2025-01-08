@@ -35,15 +35,13 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
   func startDataTask(
     _ task: URLSessionDataTask,
     session: URLSession,
-    delegate: URLSessionDataDelegate?,
-    onUploadProgress: (@Sendable (Progress) -> Void)?
+    delegate: URLSessionDataDelegate?
   ) async throws -> Response {
     try await withTaskCancellationHandler(
       operation: {
         try await withUnsafeThrowingContinuation { continuation in
           let handler = DataTaskHandler(delegate: delegate)
           handler.completion = { continuation.resume(with: $0) }
-          handler.uploadProgress = onUploadProgress
           self.handlers[task] = handler
 
           task.resume()
@@ -75,15 +73,13 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
   func startUploadTask(
     _ task: URLSessionUploadTask,
     session: URLSession,
-    delegate: URLSessionTaskDelegate?,
-    onUploadProgress: (@Sendable (Progress) -> Void)?
+    delegate: URLSessionTaskDelegate?
   ) async throws -> Response {
     try await withTaskCancellationHandler(
       operation: {
         try await withUnsafeThrowingContinuation { continuation in
           let handler = DataTaskHandler(delegate: delegate)
           handler.completion = { continuation.resume(with: $0) }
-          handler.uploadProgress = onUploadProgress
           self.handlers[task] = handler
 
           task.resume()
@@ -263,8 +259,11 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
   }
 
   func urlSession(
-    _ session: URLSession, task: URLSessionTask, didSendBodyData bytesSent: Int64,
-    totalBytesSent: Int64, totalBytesExpectedToSend: Int64
+    _ session: URLSession,
+    task: URLSessionTask,
+    didSendBodyData bytesSent: Int64,
+    totalBytesSent: Int64,
+    totalBytesExpectedToSend: Int64
   ) {
     let handler = handlers[task]
     #if os(Linux)
@@ -282,15 +281,6 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
           session, task: task, didSendBodyData: bytesSent, totalBytesSent: totalBytesSent,
           totalBytesExpectedToSend: totalBytesExpectedToSend)
     #endif
-
-    switch handler {
-    case let handler as DataTaskHandler:
-      handler.uploadProgress?(
-        Progress(totalUnitCount: totalBytesExpectedToSend, sentUnitCount: totalBytesSent)
-      )
-    default:
-      break
-    }
   }
 
   // MARK: - URLSessionDataDelegate
@@ -450,7 +440,6 @@ private final class DataTaskHandler: TaskHandler {
 
   let dataDelegate: URLSessionDataDelegate?
   var completion: Completion?
-  var uploadProgress: UploadProgress?
 
   var body: Response.Body?
 
