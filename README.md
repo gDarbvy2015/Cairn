@@ -14,6 +14,7 @@ used in web development.
 - Built-in support for JSON encoding and decoding
 - Multipart form data support
 - URL search parameters handling
+- Support for streamed responses
 
 ## Installation
 
@@ -33,7 +34,7 @@ Then, add "Fetch" to your target dependencies.
 import Fetch
 
 let response = try await fetch("https://api.example.com/data")
-let data: SomeDecodableType = try await response.json()
+let json = try await response.json()
 ```
 
 ### POST Request with JSON Body
@@ -76,6 +77,18 @@ import Fetch
 var params = URLSearchParams("https://example.com?foo=1&bar=2")
 params.append("baz", "3")
 print(params.description) // Output: foo=1&bar=2&baz=3
+```
+
+### Streamed Responses
+
+```swift
+import Fetch
+
+let response = try await fetch("https://api.example.com/stream")
+
+for await chunk in response.body {
+  // handle chunk of Data
+}
 ```
 
 # API Reference
