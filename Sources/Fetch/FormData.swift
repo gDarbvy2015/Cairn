@@ -3,8 +3,8 @@ import Foundation
 /// A structure for creating and encoding multipart/form-data content.
 /// This is commonly used for file uploads and complex form submissions in HTTP requests.
 public struct FormData: Sendable {
-  private let boundary: String
-  private var bodyParts: [BodyPart] = []
+  private var boundary: String
+  var bodyParts: [BodyPart] = []
 
   /// Initializes a new FormData instance with a random boundary.
   /// The boundary is used to separate different parts of the multipart form data.
@@ -99,8 +99,94 @@ public struct FormData: Sendable {
     return headers
   }
 
-  private struct BodyPart {
+  struct BodyPart {
     let headers: [String: String]
     let data: Data
   }
+}
+
+extension FormData {
+  /// Decodes a FormData instance from raw multipart form data.
+  /// - Parameters:
+  ///   - data: The raw multipart form data to decode
+  ///   - contentType: The Content-Type header value containing the boundary
+  /// - Returns: A decoded FormData instance
+  /// - Throws: An error if the data cannot be decoded or is malformed
+  static func decode(from data: Data, contentType: String) throws -> FormData {
+    // Extract boundary from content type
+    guard let boundary = contentType.components(separatedBy: "boundary=").last else {
+      throw FormDataError.missingBoundary
+    }
+
+    // Create FormData instance with the extracted boundary
+    var formData = FormData()
+    formData.boundary = boundary
+
+    // Convert boundary to Data for binary search
+    let boundaryData = "--\(boundary)".data(using: .utf8)!
+    let crlfData = "\r\n".data(using: .utf8)!
+    let doubleCrlfData = "\r\n\r\n".data(using: .utf8)!
+
+    // Find all boundary positions
+    var currentIndex = data.startIndex
+    var parts: [(start: Int, end: Int)] = []
+    while let boundaryRange = data[currentIndex...].range(of: boundaryData) {
+        let partStart = boundaryRange.endIndex
+        currentIndex = partStart
+        
+        // Skip if this is the final boundary
+        if let dashRange = data[currentIndex...].range(of: "--".data(using: .utf8)!) {
+            if dashRange.lowerBound == currentIndex {
+                break
+            }
+        }
+        
+        // Find the next boundary
+        if let nextBoundaryRange = data[currentIndex...].range(of: boundaryData) {
+            let partEnd = nextBoundaryRange.lowerBound - crlfData.count
+            if partStart < partEnd {
+                parts.append((start: partStart, end: partEnd))
+            }
+            currentIndex = nextBoundaryRange.lowerBound
+        }
+    }
+
+    // Process each part
+    for part in parts {
+        let partData = data[part.start..<part.end]
+        
+        // Find headers section
+        guard let headersSeparator = partData.range(of: doubleCrlfData) else { continue }
+        let headersData = partData[..<headersSeparator.lowerBound]
+        
+        // Parse headers (headers are always UTF-8)
+        guard let headersString = String(data: headersData, encoding: .utf8) else { continue }
+        var headers: [String: String] = [:]
+        
+        let headerLines = headersString.components(separatedBy: "\r\n")
+        for line in headerLines {
+            let headerParts = line.split(separator: ":", maxSplits: 1).map(String.init)
+            guard headerParts.count == 2 else { continue }
+            headers[headerParts[0].trimmingCharacters(in: .whitespaces)] =
+                headerParts[1].trimmingCharacters(in: .whitespaces)
+        }
+
+        // Extract content (binary data)
+        let contentStart = headersSeparator.upperBound
+        let contentData = partData[contentStart...]
+        
+        // Create body part with raw data
+        let bodyPart = BodyPart(headers: headers, data: Data(contentData))
+        formData.bodyParts.append(bodyPart)
+    }
+
+    return formData
+  }
+}
+
+/// Errors that can occur during FormData operations
+enum FormDataError: Error {
+  case missingBoundary
+  case invalidEncoding
+  case malformedContent
 }

@@ -60,9 +60,24 @@ public struct Response: Sendable {
     }
   }
 
-  /// Decodes the response body as a JSON.
+  /// Decodes the response body as a JSON using `JSONSerialization`.
   public func json() async throws -> Any {
     try await JSONSerialization.jsonObject(with: body.collect())
+  }
+
+  /// Decodes response body as a ``FormData``.
+  public func formData() async throws -> FormData {
+    try await FormData.decode(from: body.collect(), contentType: headers["Content-Type"] ?? "")
+  }
+
+  /// Decodes response as ``Data``.
+  public func data() async -> Data {
+    await body.collect()
+  }
+
+  /// Decodes response as a byte array.
+  public func bytes() async -> [UInt8] {
+    await [UInt8](data())
   }
 
   public struct Body: AsyncSequence, Sendable {
@@ -93,8 +108,8 @@ public struct Response: Sendable {
       continuation.finish()
     }
   }
-
 }
+
 extension Response.Body {
   public static func string(_ string: String, using encoding: String.Encoding = .utf8) -> Self {
     let body = Self()

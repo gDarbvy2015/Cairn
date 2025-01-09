@@ -72,6 +72,53 @@ import Testing
   #expect(encodedString.contains("foo=bar&baz=foo"))
 }
 
+@Test func testFormDataDecoding() throws {
+  // Create a FormData instance with known content
+  var originalForm = FormData()
+  try originalForm.append("name", "John Doe")
+  try originalForm.append("email", "john@example.com")
+
+  // Encode it
+  let encodedData = originalForm.encode()
+  let contentType = originalForm.contentType
+
+  // Decode it back
+  let decodedForm = try FormData.decode(from: encodedData, contentType: contentType)
+
+  // Encode the decoded form to verify contents match
+  let reEncodedData = decodedForm.encode()
+  let decodedString = String(data: reEncodedData, encoding: .utf8)!
+
+  #expect(decodedString.contains("name=\"name\""))
+  #expect(decodedString.contains("John Doe"))
+  #expect(decodedString.contains("name=\"email\""))
+  #expect(decodedString.contains("john@example.com"))
+}
+
+@Test func testFormDataDecodingWithBinaryContent() throws {
+  // Create binary data
+  let binaryData = Data((0...255).map { UInt8($0) })
+
+  // Create a FormData instance with binary content
+  var originalForm = FormData()
+  try originalForm.append(
+    "file", binaryData, filename: "test.bin", contentType: "application/octet-stream")
+
+  // Encode it
+  let encodedData = originalForm.encode()
+  let contentType = originalForm.contentType
+
+  // Decode it back
+  let decodedForm = try FormData.decode(from: encodedData, contentType: contentType)
+
+  // Verify the decoded data matches the original
+  let decodedPart = decodedForm.bodyParts.first
+  #expect(decodedPart != nil)
+  #expect(decodedPart?.headers["Content-Type"] == "application/octet-stream")
+  #expect(decodedPart?.headers["Content-Disposition"]?.contains("filename=\"test.bin\"") == true)
+  #expect(decodedPart?.data == binaryData)
+}
+
 struct CustomValue: Encodable {
   let id: Int
   let name: String
