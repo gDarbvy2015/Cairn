@@ -20,7 +20,7 @@ public struct RequestOptions: @unchecked Sendable {
   public let body: Any?
 
   /// A dictionary of HTTP headers to be included in the request.
-  public let headers: [String: String]
+  public var headers: [String: String]
 
   /// Initializes a new `RequestOptions` instance.
   /// - Parameters:
@@ -44,7 +44,7 @@ public struct Request: Sendable {
   public let url: URL
 
   /// Optional `RequestOptions` for the request.
-  public let options: RequestOptions?
+  public var options: RequestOptions?
 
   /// Initializes a new `Request` instance.
   /// - Parameters:
