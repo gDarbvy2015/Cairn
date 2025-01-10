@@ -12,12 +12,12 @@ import Foundation
 #endif
 
 /// Represents options for an HTTP request.
-public struct RequestOptions: @unchecked Sendable {
+public struct RequestOptions: Sendable {
   /// The HTTP method for the request (e.g., "GET", "POST", "PUT", etc.).
-  public let method: String
+  public var method: String
 
   /// The body of the request. Supported types are (`Data`,, `String`, `InputStream`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
-  public let body: (any Sendable)?
+  public var body: (any Sendable)?
 
   /// A dictionary of HTTP headers to be included in the request.
   public var headers: [String: String]
@@ -41,7 +41,7 @@ public struct RequestOptions: @unchecked Sendable {
 /// Represents an HTTP request.
 public struct Request: Sendable {
   /// The URL for the request.
-  public let url: URL
+  public var url: URL
 
   /// Optional `RequestOptions` for the request.
   public var options: RequestOptions?
