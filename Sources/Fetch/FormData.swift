@@ -131,53 +131,53 @@ extension FormData {
     var currentIndex = data.startIndex
     var parts: [(start: Int, end: Int)] = []
     while let boundaryRange = data[currentIndex...].range(of: boundaryData) {
-        let partStart = boundaryRange.endIndex
-        currentIndex = partStart
-        
-        // Skip if this is the final boundary
-        if let dashRange = data[currentIndex...].range(of: "--".data(using: .utf8)!) {
-            if dashRange.lowerBound == currentIndex {
-                break
-            }
+      let partStart = boundaryRange.endIndex
+      currentIndex = partStart
+
+      // Skip if this is the final boundary
+      if let dashRange = data[currentIndex...].range(of: "--".data(using: .utf8)!) {
+        if dashRange.lowerBound == currentIndex {
+          break
         }
-        
-        // Find the next boundary
-        if let nextBoundaryRange = data[currentIndex...].range(of: boundaryData) {
-            let partEnd = nextBoundaryRange.lowerBound - crlfData.count
-            if partStart < partEnd {
-                parts.append((start: partStart, end: partEnd))
-            }
-            currentIndex = nextBoundaryRange.lowerBound
+      }
+
+      // Find the next boundary
+      if let nextBoundaryRange = data[currentIndex...].range(of: boundaryData) {
+        let partEnd = nextBoundaryRange.lowerBound - crlfData.count
+        if partStart < partEnd {
+          parts.append((start: partStart, end: partEnd))
         }
+        currentIndex = nextBoundaryRange.lowerBound
+      }
     }
 
     // Process each part
     for part in parts {
-        let partData = data[part.start..<part.end]
-        
-        // Find headers section
-        guard let headersSeparator = partData.range(of: doubleCrlfData) else { continue }
-        let headersData = partData[..<headersSeparator.lowerBound]
-        
-        // Parse headers (headers are always UTF-8)
-        guard let headersString = String(data: headersData, encoding: .utf8) else { continue }
-        var headers: [String: String] = [:]
-        
-        let headerLines = headersString.components(separatedBy: "\r\n")
-        for line in headerLines {
-            let headerParts = line.split(separator: ":", maxSplits: 1).map(String.init)
-            guard headerParts.count == 2 else { continue }
-            headers[headerParts[0].trimmingCharacters(in: .whitespaces)] =
-                headerParts[1].trimmingCharacters(in: .whitespaces)
-        }
+      let partData = data[part.start..<part.end]
 
-        // Extract content (binary data)
-        let contentStart = headersSeparator.upperBound
-        let contentData = partData[contentStart...]
-        
-        // Create body part with raw data
-        let bodyPart = BodyPart(headers: headers, data: Data(contentData))
-        formData.bodyParts.append(bodyPart)
+      // Find headers section
+      guard let headersSeparator = partData.range(of: doubleCrlfData) else { continue }
+      let headersData = partData[..<headersSeparator.lowerBound]
+
+      // Parse headers (headers are always UTF-8)
+      guard let headersString = String(data: headersData, encoding: .utf8) else { continue }
+      var headers: [String: String] = [:]
+
+      let headerLines = headersString.components(separatedBy: "\r\n")
+      for line in headerLines {
+        let headerParts = line.split(separator: ":", maxSplits: 1).map(String.init)
+        guard headerParts.count == 2 else { continue }
+        headers[headerParts[0].trimmingCharacters(in: .whitespaces)] =
+          headerParts[1].trimmingCharacters(in: .whitespaces)
+      }
+
+      // Extract content (binary data)
+      let contentStart = headersSeparator.upperBound
+      let contentData = partData[contentStart...]
+
+      // Create body part with raw data
+      let bodyPart = BodyPart(headers: headers, data: Data(contentData))
+      formData.bodyParts.append(bodyPart)
     }
 
     return formData
