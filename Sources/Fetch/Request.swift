@@ -16,7 +16,7 @@ public struct RequestOptions: Sendable {
   /// The HTTP method for the request (e.g., "GET", "POST", "PUT", etc.).
   public var method: String
 
-  /// The body of the request. Supported types are (`Data`,, `String`, `InputStream`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
+  /// The body of the request. Supported types are (`Data`,, `String`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
   public var body: (any Sendable)?
 
   /// A dictionary of HTTP headers to be included in the request.
@@ -25,7 +25,7 @@ public struct RequestOptions: Sendable {
   /// Initializes a new `RequestOptions` instance.
   /// - Parameters:
   ///   - method: The HTTP method for the request. Defaults to "GET".
-  ///   - body: The body of the request. Supported types are (`Data`, `String`, `InputStream`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
+  ///   - body: The body of the request. Supported types are (`Data`, `String`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
   ///   - headers: A dictionary of HTTP headers. Defaults to an empty dictionary.
   public init(
     method: String = "GET",

@@ -165,13 +165,6 @@ public actor Fetch: Fetcher {
           let task = session.uploadTask(with: urlRequest, from: uploadData)
           return try await dataLoader.startUploadTask(
             task, session: session, delegate: nil)
-        } else if urlRequest.httpBodyStream != nil {
-          let task = session.dataTask(with: urlRequest)
-          return try await dataLoader.startDataTask(
-            task,
-            session: session,
-            delegate: nil
-          )
         } else {
           fatalError("Bad request")
         }
@@ -201,10 +194,6 @@ public actor Fetch: Fetcher {
 
     case let url as URL:
       return try Data(contentsOf: url)
-
-    case let stream as InputStream:
-      request.httpBodyStream = stream
-      return nil
 
     case let formData as FormData:
       if request.value(forHTTPHeaderField: "Content-Type") == nil {
