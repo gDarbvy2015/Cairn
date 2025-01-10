@@ -151,10 +151,10 @@ public actor Fetch: Fetcher {
     _ request: Request
   ) async throws -> Response {
     var urlRequest = URLRequest(url: request.url)
-    urlRequest.httpMethod = request.options?.method
-    urlRequest.allHTTPHeaderFields = request.options?.headers
+    urlRequest.httpMethod = request.options.method
+    urlRequest.allHTTPHeaderFields = request.options.headers
 
-    if let body = request.options?.body {
+    if let body = request.options.body {
       if let url = body as? URL {
         let task = session.uploadTask(with: urlRequest, fromFile: url)
         return try await dataLoader.startUploadTask(

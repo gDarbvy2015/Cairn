@@ -44,7 +44,7 @@ public struct Request: Sendable {
   public var url: URL
 
   /// Optional `RequestOptions` for the request.
-  public var options: RequestOptions?
+  public var options: RequestOptions
 
   /// Initializes a new `Request` instance.
   /// - Parameters:
@@ -52,7 +52,7 @@ public struct Request: Sendable {
   ///   - options: Optional `RequestOptions` for the request.
   public init(url: URL, options: RequestOptions? = nil) {
     self.url = url
-    self.options = options
+    self.options = options ?? RequestOptions()
   }
 }
 
