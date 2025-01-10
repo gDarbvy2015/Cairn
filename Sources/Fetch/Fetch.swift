@@ -191,16 +191,13 @@ public actor Fetch: Fetcher {
   ///   - value: The value to encode as the request body.
   ///   - request: The `URLRequest` to modify with the encoded body.
   /// - Throws: An error if encoding fails or if the value type is not supported.
-  private func encode(_ value: Any, in request: inout URLRequest) throws -> Data? {
+  private func encode(_ value: any Sendable, in request: inout URLRequest) throws -> Data? {
     switch value {
     case let data as Data:
       return data
 
     case let str as String:
       return str.data(using: .utf8)!
-
-    case let arr as [UInt8]:
-      return Data(arr)
 
     case let url as URL:
       return try Data(contentsOf: url)

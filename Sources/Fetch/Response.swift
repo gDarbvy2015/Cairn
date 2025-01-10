@@ -75,11 +75,6 @@ public struct Response: Sendable {
     await body.collect()
   }
 
-  /// Decodes response as a byte array.
-  public func bytes() async -> [UInt8] {
-    await [UInt8](data())
-  }
-
   public struct Body: AsyncSequence, Sendable {
     public typealias AsyncIterator = AsyncStream<Data>.Iterator
     public typealias Element = Data
@@ -123,9 +118,5 @@ extension Response.Body {
     body.append(data)
     body.finalize()
     return body
-  }
-
-  public static func bytes(_ bytes: [UInt8]) -> Self {
-    .data(Data(bytes))
   }
 }

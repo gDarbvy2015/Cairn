@@ -51,6 +51,10 @@ public struct URLSearchParams: Sendable, CustomStringConvertible {
     self.items = items
   }
 
+  public init() {
+    self.items = []
+  }
+
   /// Appends a new search parameter.
   /// - Parameters:
   ///   - name: The name of the parameter.

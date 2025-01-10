@@ -16,8 +16,8 @@ public struct RequestOptions: @unchecked Sendable {
   /// The HTTP method for the request (e.g., "GET", "POST", "PUT", etc.).
   public let method: String
 
-  /// The body of the request. Supported types are (`Data`, `[UInt8]`, `String`, `InputStream`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
-  public let body: Any?
+  /// The body of the request. Supported types are (`Data`,, `String`, `InputStream`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
+  public let body: (any Sendable)?
 
   /// A dictionary of HTTP headers to be included in the request.
   public var headers: [String: String]
@@ -25,7 +25,7 @@ public struct RequestOptions: @unchecked Sendable {
   /// Initializes a new `RequestOptions` instance.
   /// - Parameters:
   ///   - method: The HTTP method for the request. Defaults to "GET".
-  ///   - body: The body of the request. Supported types are (`Data`, `[UInt8]`, `String`, `InputStream`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
+  ///   - body: The body of the request. Supported types are (`Data`, `String`, `InputStream`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
   ///   - headers: A dictionary of HTTP headers. Defaults to an empty dictionary.
   public init(
     method: String = "GET",
