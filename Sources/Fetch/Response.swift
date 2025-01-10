@@ -75,13 +75,16 @@ public struct Response: Sendable {
     await body.collect()
   }
 
-  public struct Body: AsyncSequence, Sendable {
+  public final class Body: AsyncSequence, @unchecked Sendable {
     public typealias AsyncIterator = AsyncStream<Data>.Iterator
     public typealias Element = Data
     public typealias Failure = Never
 
     let stream: AsyncStream<Data>
     let continuation: AsyncStream<Data>.Continuation
+
+    private let lock = NSRecursiveLock()
+    private var data: Data?
 
     init() {
       (stream, continuation) = AsyncStream.makeStream()
@@ -92,7 +95,13 @@ public struct Response: Sendable {
     }
 
     public func collect() async -> Data {
-      await stream.reduce(into: Data()) { $0 += $1 }
+      if let data = lock.withLock({ self.data }) {
+        return data
+      }
+
+      let data = await stream.reduce(into: Data()) { $0 += $1 }
+      lock.withLock { self.data = data }
+      return data
     }
 
     func append(_ data: Data) {
