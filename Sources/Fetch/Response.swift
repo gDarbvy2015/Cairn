@@ -49,13 +49,12 @@ public struct Response: Sendable {
   }
 
   /// Lock used for synchronizing access to \_decoder.
-  private static let _lock = NSRecursiveLock()
-  nonisolated(unsafe) private static var _decoder = JSONDecoder()
+  private static let _decoder = LockIsolated(JSONDecoder())
 
   /// The default decoder instance used in ``decode(as:decoder:)`` method.
   public static var decoder: JSONDecoder {
-    get { _lock.withLock { _decoder } }
-    set { _lock.withLock { _decoder = newValue } }
+    get { _decoder.withValue { $0 } }
+    set { _decoder.withValue { $0 = newValue } }
   }
 
   /// Decodes the response body to a specified type.
