@@ -2,6 +2,7 @@
 //
 // Copyright (c) 2021-2024 Alexander Grebenyuk (github.com/kean).
 
+import Fetch
 import Foundation
 
 #if canImport(FoundationNetworking)
@@ -436,7 +437,6 @@ private class TaskHandler {
 
 private final class DataTaskHandler: TaskHandler {
   typealias Completion = (Result<Response, Error>) -> Void
-  typealias UploadProgress = (Progress) -> Void
 
   let dataDelegate: URLSessionDataDelegate?
   var completion: Completion?

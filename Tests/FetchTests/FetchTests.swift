@@ -5,10 +5,10 @@
 //  Created by Guilherme Souza on 12/12/24.
 //
 
+import Fetch
+import FetchFoundation
 import Foundation
 import Testing
-
-@testable import Fetch
 
 @Suite
 struct FetchTests {
@@ -22,8 +22,8 @@ struct FetchTests {
     let response = try await fetch(
       "https://httpbin.org/anything",
       options: RequestOptions(
-        method: "POST",
-        body: Data("Hello World".utf8),
+        method: .post,
+        body: .data(Data("Hello World".utf8)),
         headers: ["Content-Type": "text/plain"]
       )
     )
@@ -47,8 +47,8 @@ struct FetchTests {
     let response = try await fetch(
       "https://httpbin.org/anything",
       options: RequestOptions(
-        method: "POST",
-        body: body,
+        method: .post,
+        body: .string(body),
         headers: ["Content-Type": "application/octet-stream"]
       )
     )
@@ -66,13 +66,13 @@ struct FetchTests {
     }
 
     var body = FormData()
-    try body.append("file", "Hello World")
+    try body.append("file", .string("Hello World"))
 
     let response = try await fetch(
       "https://httpbin.org/anything",
       options: RequestOptions(
-        method: "POST",
-        body: body,
+        method: .post,
+        body: .formData(body),
         headers: ["Content-Type": body.contentType]
       )
     )
@@ -96,8 +96,8 @@ struct FetchTests {
     let response = try await fetch(
       "https://httpbin.org/anything",
       options: RequestOptions(
-        method: "POST",
-        body: body,
+        method: .post,
+        body: .urlSearchParams(body),
         headers: ["Content-Type": "application/x-www-form-urlencoded"]
       )
     )
@@ -129,8 +129,8 @@ struct FetchTests {
     let response = try await fetch(
       "https://httpbin.org/anything",
       options: RequestOptions(
-        method: "POST",
-        body: body,
+        method: .post,
+        body: .json(body),
         headers: ["Content-Type": "application/json"]
       )
     )
@@ -166,8 +166,8 @@ struct FetchTests {
     let response = try await fetch(
       "https://httpbin.org/anything",
       options: RequestOptions(
-        method: "POST",
-        body: body,
+        method: .post,
+        body: .encodable(body),
         headers: ["Content-Type": "application/json"]
       )
     )

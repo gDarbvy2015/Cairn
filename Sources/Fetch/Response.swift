@@ -25,6 +25,13 @@ public struct Response: Sendable {
   /// The HTTP status code of the response.
   public let status: Int
 
+  package init(url: URL, body: Body, headers: [String: String], status: Int) {
+    self.url = url
+    self.body = body
+    self.headers = headers
+    self.status = status
+  }
+
   /// The HTTP status text of the response.
   public var statusText: String {
     HTTPURLResponse.localizedString(forStatusCode: status)
@@ -39,6 +46,16 @@ public struct Response: Sendable {
   /// - Returns: The response body as a UTF-8 encoded string.
   public func text() async -> String {
     await String(decoding: body.collect(), as: UTF8.self)
+  }
+
+  /// Lock used for synchronizing access to \_decoder.
+  private static let _lock = NSRecursiveLock()
+  nonisolated(unsafe) private static var _decoder = JSONDecoder()
+
+  /// The default decoder instance used in ``decode(as:decoder:)`` method.
+  public static var decoder: JSONDecoder {
+    get { _lock.withLock { _decoder } }
+    set { _lock.withLock { _decoder = newValue } }
   }
 
   /// Decodes the response body to a specified type.
@@ -56,7 +73,7 @@ public struct Response: Sendable {
     } else if T.self is String.Type {
       return await self.text() as! T
     } else {
-      return try await (decoder ?? Fetch.decoder).decode(type, from: body.collect())
+      return try await (decoder ?? Response.decoder).decode(type, from: body.collect())
     }
   }
 
@@ -86,7 +103,7 @@ public struct Response: Sendable {
     private let lock = NSRecursiveLock()
     private var data: Data?
 
-    init() {
+    package init() {
       (stream, continuation) = AsyncStream.makeStream()
     }
 
@@ -104,11 +121,11 @@ public struct Response: Sendable {
       return data
     }
 
-    func append(_ data: Data) {
+    package func append(_ data: Data) {
       continuation.yield(data)
     }
 
-    func finalize() {
+    package func finalize() {
       continuation.finish()
     }
   }

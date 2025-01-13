@@ -14,10 +14,10 @@ import Foundation
 /// Represents options for an HTTP request.
 public struct RequestOptions: Sendable {
   /// The HTTP method for the request (e.g., "GET", "POST", "PUT", etc.).
-  public var method: String
+  public var method: Request.Method
 
-  /// The body of the request. Supported types are (`Data`,, `String`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
-  public var body: (any Sendable)?
+  /// The body of the request. Supported types are (`Data`, `String`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
+  public var body: Request.Body?
 
   /// A dictionary of HTTP headers to be included in the request.
   public var headers: [String: String]
@@ -28,8 +28,8 @@ public struct RequestOptions: Sendable {
   ///   - body: The body of the request. Supported types are (`Data`, `String`, `FormData`, `URLSearchParams`, `any valid JSON object`, `any Encodable`).
   ///   - headers: A dictionary of HTTP headers. Defaults to an empty dictionary.
   public init(
-    method: String = "GET",
-    body: (any Sendable)? = nil,
+    method: Request.Method = .get,
+    body: Request.Body? = nil,
     headers: [String: String] = [:]
   ) {
     self.method = method
@@ -53,6 +53,41 @@ public struct Request: Sendable {
   public init(url: URL, options: RequestOptions? = nil) {
     self.url = url
     self.options = options ?? RequestOptions()
+  }
+
+  public struct Method: RawRepresentable, Sendable, ExpressibleByStringLiteral {
+    public var rawValue: String
+
+    public init(_ rawValue: String) {
+      self.init(rawValue: rawValue)
+    }
+
+    public init(rawValue: String) {
+      self.rawValue = rawValue
+    }
+
+    public init(stringLiteral value: String) {
+      self.init(rawValue: value)
+    }
+
+    public static let get = Method("GET")
+    public static let post = Method("POST")
+    public static let put = Method("PUT")
+    public static let patch = Method("PATCH")
+    public static let delete = Method("DELETE")
+    public static let head = Method("HEAD")
+    public static let options = Method("OPTIONS")
+    public static let trace = Method("TRACE")
+  }
+
+  public enum Body: Sendable {
+    case url(URL)
+    case data(Data)
+    case string(String, encoding: String.Encoding = .utf8)
+    case formData(FormData)
+    case urlSearchParams(URLSearchParams)
+    case json(any Sendable)
+    case encodable(any Encodable & Sendable, encoder: JSONEncoder? = nil)
   }
 }
 

@@ -5,7 +5,7 @@ import Testing
 
 @Test func testAppendStringValue() throws {
   var formData = FormData()
-  try formData.append("name", "John Doe")
+  try formData.append("name", .string("John Doe"))
 
   let encodedData = formData.encode()
   let encodedString = String(data: encodedData, encoding: .utf8)!
@@ -17,7 +17,7 @@ import Testing
 @Test func testAppendDataValue() throws {
   var formData = FormData()
   let imageData = Data([0xFF, 0xD8, 0xFF, 0xE0]).base64EncodedData()  // Mock JPEG data
-  try formData.append("image", imageData, filename: "test.jpg", contentType: "image/jpeg")
+  try formData.append("image", .data(imageData), filename: "test.jpg", contentType: "image/jpeg")
 
   let encodedData = formData.encode()
   let encodedString = String(decoding: encodedData, as: UTF8.self)
@@ -32,8 +32,8 @@ import Testing
 
 @Test func testAppendMultipleValues() throws {
   var formData = FormData()
-  try formData.append("key1", "value1")
-  try formData.append("key2", "value2")
+  try formData.append("key1", .string("value1"))
+  try formData.append("key2", .string("value2"))
 
   let encodedData = formData.encode()
   let encodedString = String(data: encodedData, encoding: .utf8)!
@@ -51,7 +51,7 @@ import Testing
 
 @Test func testEncodingWithCustomValue() throws {
   var formData = FormData()
-  try formData.append("custom", CustomValue(id: 123, name: "Test"))
+  try formData.append("custom", .encodable(CustomValue(id: 123, name: "Test")))
 
   let encodedData = formData.encode()
   let encodedString = String(data: encodedData, encoding: .utf8)!
@@ -63,7 +63,7 @@ import Testing
 
 @Test func testEncodingWithURLSearchParams() throws {
   var formData = FormData()
-  try formData.append("params", URLSearchParams("foo=bar&baz=foo"))
+  try formData.append("params", .urlSearchParams(URLSearchParams("foo=bar&baz=foo")))
 
   let encodedData = formData.encode()
   let encodedString = String(data: encodedData, encoding: .utf8)!
@@ -75,8 +75,8 @@ import Testing
 @Test func testFormDataDecoding() throws {
   // Create a FormData instance with known content
   var originalForm = FormData()
-  try originalForm.append("name", "John Doe")
-  try originalForm.append("email", "john@example.com")
+  try originalForm.append("name", .string("John Doe"))
+  try originalForm.append("email", .string("john@example.com"))
 
   // Encode it
   let encodedData = originalForm.encode()
@@ -102,7 +102,7 @@ import Testing
   // Create a FormData instance with binary content
   var originalForm = FormData()
   try originalForm.append(
-    "file", binaryData, filename: "test.bin", contentType: "application/octet-stream")
+    "file", .data(binaryData), filename: "test.bin", contentType: "application/octet-stream")
 
   // Encode it
   let encodedData = originalForm.encode()

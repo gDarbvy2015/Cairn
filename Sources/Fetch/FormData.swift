@@ -3,6 +3,15 @@ import Foundation
 /// A structure for creating and encoding multipart/form-data content.
 /// This is commonly used for file uploads and complex form submissions in HTTP requests.
 public struct FormData: Sendable {
+  public enum Value: Sendable {
+    case data(Data)
+    case string(String)
+    case url(URL)
+    case urlSearchParams(URLSearchParams)
+    case json(any Sendable)
+    case encodable(any Encodable & Sendable, encoder: JSONEncoder? = nil)
+  }
+
   private var boundary: String
   var bodyParts: [BodyPart] = []
 
@@ -23,7 +32,7 @@ public struct FormData: Sendable {
   /// - Throws: An error if the value cannot be converted to Data or if the value type is not supported.
   public mutating func append(
     _ name: String,
-    _ value: Any,
+    _ value: Value,
     filename: String? = nil,
     contentType: String? = nil
   ) throws {
@@ -31,22 +40,18 @@ public struct FormData: Sendable {
     let data: Data
 
     switch value {
-    case let d as Data:
+    case let .data(d):
       data = d
-    case let str as String:
+    case let .string(str):
       data = Data(str.utf8)
-    case let url as URL:
+    case let .url(url):
       data = try Data(contentsOf: url)
-    case let searchParams as URLSearchParams:
+    case let .urlSearchParams(searchParams):
       data = Data(searchParams.description.utf8)
-    default:
-      if JSONSerialization.isValidJSONObject(value) {
-        data = try JSONSerialization.data(withJSONObject: value)
-      } else if let value = value as? any Encodable {
-        data = try Fetch.encoder.encode(value)
-      } else {
-        throw UnsupportedBodyTypeError(type: type(of: value))
-      }
+    case let .json(value):
+      data = try JSONSerialization.data(withJSONObject: value)
+    case let .encodable(value, encoder):
+      data = try (encoder ?? JSONEncoder()).encode(value)
     }
 
     let bodyPart = BodyPart(headers: headers, data: data)
