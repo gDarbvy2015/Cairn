@@ -5,7 +5,6 @@
 //  Created by Guilherme Souza on 12/12/24.
 //
 
-import Fetch
 import FetchFoundation
 import Foundation
 import Testing

@@ -1,4 +1,4 @@
-import Fetch
+@_exported import Fetch
 import Foundation
 
 #if canImport(FoundationNetworking)
