@@ -15,6 +15,7 @@ let package = Package(
   products: [
     .library(name: "Fetch", targets: ["Fetch"]),
     .library(name: "FetchFoundation", targets: ["FetchFoundation"]),
+    .library(name: "FetchMock", targets: ["FetchMock"]),
   ],
   targets: [
     .target(name: "Fetch"),
@@ -23,6 +24,7 @@ let package = Package(
       dependencies: [
         "Fetch",
         "FetchFoundation",
+        "FetchMock",
       ]
     ),
     .target(
@@ -31,6 +33,7 @@ let package = Package(
         "Fetch"
       ]
     ),
+    .target(name: "FetchMock", dependencies: ["Fetch"]),
   ],
   swiftLanguageModes: [.v6]
 )

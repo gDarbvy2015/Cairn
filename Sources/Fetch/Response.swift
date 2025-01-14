@@ -144,4 +144,8 @@ extension Response.Body {
     body.finalize()
     return body
   }
+
+  public static func json(_ value: any Sendable) throws -> Self {
+    data(try JSONSerialization.data(withJSONObject: value))
+  }
 }
