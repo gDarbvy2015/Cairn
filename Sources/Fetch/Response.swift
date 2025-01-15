@@ -25,7 +25,7 @@ public struct Response: Sendable {
   /// The HTTP status code of the response.
   public let status: Int
 
-  package init(url: URL, body: Body, headers: [String: String], status: Int) {
+  public init(url: URL, body: Body, headers: [String: String], status: Int) {
     self.url = url
     self.body = body
     self.headers = headers
