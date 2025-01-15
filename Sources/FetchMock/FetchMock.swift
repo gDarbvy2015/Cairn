@@ -22,6 +22,9 @@ public actor FetchMock: Fetch {
 
   private var mocks: [Mock] = []
 
+  public private(set) var receivedRequests: [Request] = []
+  public private(set) var returnedResponses: [Response] = []
+
   @discardableResult
   public func register(
     scheme: Match<String> = .any,
@@ -49,7 +52,11 @@ public actor FetchMock: Fetch {
       fatalError("Mock not found.")
     }
 
-    return try mock.returns(request)
+    receivedRequests.append(request)
+
+    let response = try mock.returns(request)
+    returnedResponses.append(response)
+    return response
   }
 
   private func findMock(for request: Request) -> Mock? {
