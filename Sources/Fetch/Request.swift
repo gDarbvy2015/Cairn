@@ -55,7 +55,7 @@ public struct Request: Sendable {
     self.options = options ?? RequestOptions()
   }
 
-  public struct Method: RawRepresentable, Sendable, ExpressibleByStringLiteral {
+  public struct Method: RawRepresentable, Sendable, Hashable, ExpressibleByStringLiteral {
     public var rawValue: String
 
     public init(_ rawValue: String) {
