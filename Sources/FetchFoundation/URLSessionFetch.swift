@@ -90,7 +90,7 @@ public struct URLSessionFetch: Fetch {
   ) async throws -> Response {
     var urlRequest = URLRequest(url: request.url)
     urlRequest.httpMethod = request.options.method.rawValue
-    urlRequest.allHTTPHeaderFields = request.options.headers
+    urlRequest.allHTTPHeaderFields = request.options.headers.dictionary
 
     if let body = request.options.body {
       if case .url(let url) = body {

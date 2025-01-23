@@ -20,7 +20,7 @@ public struct RequestOptions: Sendable {
   public var body: Request.Body?
 
   /// A dictionary of HTTP headers to be included in the request.
-  public var headers: [String: String]
+  public var headers: HTTPHeaders
 
   /// Initializes a new `RequestOptions` instance.
   /// - Parameters:
@@ -30,7 +30,7 @@ public struct RequestOptions: Sendable {
   public init(
     method: Request.Method = .get,
     body: Request.Body? = nil,
-    headers: [String: String] = [:]
+    headers: HTTPHeaders = [:]
   ) {
     self.method = method
     self.body = body

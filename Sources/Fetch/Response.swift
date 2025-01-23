@@ -5,10 +5,16 @@
 //  Created by Guilherme Souza on 08/01/25.
 //
 
-import Foundation
+import ConcurrencyExtras
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
+#endif
+
+#if !canImport(Darwin) || compiler(>=5.9)
+  @preconcurrency import Foundation
+#else
+  import Foundation
 #endif
 
 /// Represents an HTTP response.
@@ -20,12 +26,12 @@ public struct Response: Sendable {
   public let body: Body
 
   /// A dictionary of HTTP headers received in the response.
-  public let headers: [String: String]
+  public let headers: HTTPHeaders
 
   /// The HTTP status code of the response.
   public let status: Int
 
-  public init(url: URL, body: Body, headers: [String: String], status: Int) {
+  public init(url: URL, body: Body, headers: HTTPHeaders, status: Int) {
     self.url = url
     self.body = body
     self.headers = headers
@@ -53,8 +59,8 @@ public struct Response: Sendable {
 
   /// The default decoder instance used in ``decode(as:decoder:)`` method.
   public static var decoder: JSONDecoder {
-    get { _decoder.withValue { $0 } }
-    set { _decoder.withValue { $0 = newValue } }
+    get { _decoder.value }
+    set { _decoder.setValue(newValue) }
   }
 
   /// Decodes the response body to a specified type.
@@ -91,7 +97,7 @@ public struct Response: Sendable {
     await body.collect()
   }
 
-  public final class Body: AsyncSequence, @unchecked Sendable {
+  public final class Body: AsyncSequence, Sendable {
     public typealias AsyncIterator = AsyncStream<Data>.Iterator
     public typealias Element = Data
     public typealias Failure = Never
@@ -99,8 +105,7 @@ public struct Response: Sendable {
     let stream: AsyncStream<Data>
     let continuation: AsyncStream<Data>.Continuation
 
-    private let lock = NSRecursiveLock()
-    private var data: Data?
+    private let data = LockIsolated<Data?>(nil)
 
     package init() {
       (stream, continuation) = AsyncStream.makeStream()
@@ -111,12 +116,12 @@ public struct Response: Sendable {
     }
 
     public func collect() async -> Data {
-      if let data = lock.withLock({ self.data }) {
+      if let data = data.value {
         return data
       }
 
       let data = await stream.reduce(into: Data()) { $0 += $1 }
-      lock.withLock { self.data = data }
+      self.data.setValue(data)
       return data
     }
 

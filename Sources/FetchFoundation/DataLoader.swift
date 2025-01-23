@@ -132,7 +132,7 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
         let response = Response(
           url: response.url!,
           body: body,
-          headers: response.allHeaderFields as! [String: String],
+          headers: HTTPHeaders(response.allHeaderFields as! [String: String]),
           status: response.statusCode
         )
         handler.completion?(.success(response))
@@ -152,7 +152,7 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
           let response = Response(
             url: response.url!,
             body: body,
-            headers: response.allHeaderFields as! [String: String],
+            headers: HTTPHeaders(response.allHeaderFields as! [String: String]),
             status: response.statusCode
           )
           handler.completion?(.success(response))

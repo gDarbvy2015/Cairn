@@ -17,8 +17,13 @@ let package = Package(
     .library(name: "FetchFoundation", targets: ["FetchFoundation"]),
     .library(name: "FetchMock", targets: ["FetchMock"]),
   ],
+  dependencies: [
+    .package(url: "https://github.com/pointfreeco/swift-concurrency-extras.git", from: "1.0.0")
+  ],
   targets: [
-    .target(name: "Fetch"),
+    .target(
+      name: "Fetch",
+      dependencies: [.product(name: "ConcurrencyExtras", package: "swift-concurrency-extras")]),
     .testTarget(
       name: "FetchTests",
       dependencies: [
