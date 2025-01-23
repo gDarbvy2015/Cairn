@@ -38,17 +38,23 @@ public struct URLSearchParams: Sendable, CustomStringConvertible {
   /// print(params2.description) // Output: "foo=1&bar=2"
   /// ```
   public init(_ url: String) {
-    guard let query = url.split(separator: "?").last else {
+    let components = URLComponents(string: url)
+    if let query = components?.query {
+      self.items = Self.parseQuery(query)
+    } else if !url.contains("?") {
+      self.items = Self.parseQuery(url)
+    } else {
       self.items = []
-      return
     }
+  }
 
-    let items = query.split(separator: "&").map { pair in
+  private static func parseQuery(_ query: String) -> [(String, String?)] {
+    query.split(separator: "&").compactMap { pair -> (String, String?)? in
       let keyValue = pair.split(separator: "=", maxSplits: 1)
-      return (String(keyValue.first!), keyValue.last?.removingPercentEncoding)
+      guard let key = keyValue.first?.removingPercentEncoding else { return nil }
+      let value = keyValue.count > 1 ? keyValue[1].removingPercentEncoding : nil
+      return (key, value)
     }
-
-    self.items = items
   }
 
   public init() {
@@ -67,7 +73,11 @@ public struct URLSearchParams: Sendable, CustomStringConvertible {
   /// print(params.description) // Output: "foo=1&bar=2"
   /// ```
   public mutating func append(_ name: String, _ value: Any) {
-    items.append((name, String(describing: value)))
+    guard !name.isEmpty else { return }
+    let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? name
+    let encodedValue = String(describing: value).addingPercentEncoding(
+      withAllowedCharacters: .urlQueryAllowed)
+    items.append((encodedName, encodedValue))
   }
 
   /// Deletes a search parameter.
@@ -86,8 +96,13 @@ public struct URLSearchParams: Sendable, CustomStringConvertible {
   /// print(params.description) // Output: "bar=2&foo=3"
   /// ```
   public mutating func delete(_ name: String, _ value: Any? = nil) {
-    items.removeAll {
-      $0.0 == name && ($0.1 == nil || $0.1 == String(describing: value!))
+    if let specificValue = value {
+      let valueStr = String(describing: specificValue)
+      items.removeAll { item in
+        item.0 == name && item.1 == valueStr
+      }
+    } else {
+      items.removeAll { $0.0 == name }
     }
   }
 
@@ -177,6 +192,12 @@ public struct URLSearchParams: Sendable, CustomStringConvertible {
   /// print(params.description) // Output: "foo=1&bar=2"
   /// ```
   public var description: String {
-    items.map { "\($0.0)=\($0.1 ?? "")" }.joined(separator: "&")
+    items.map { pair in
+      if let value = pair.1 {
+        return "\(pair.0)=\(value)"
+      } else {
+        return pair.0
+      }
+    }.joined(separator: "&")
   }
 }
