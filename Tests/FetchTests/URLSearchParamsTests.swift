@@ -13,7 +13,7 @@ struct URLSearchParamsTests {
     var params = URLSearchParams(url)
     #expect(params.description == "foo=1&bar=2")
 
-    params.append("foo", 4)
+    params.append("foo", "4")
     #expect(params.description == "foo=1&bar=2&foo=4")
 
     params.sort()
@@ -70,10 +70,10 @@ struct URLSearchParamsTests {
     let values = valueParams.values()
     #expect(values == ["value1", "value2", "value3"])
 
-    // Test handling of nil values
+    // Test handling of empty values
     var nilParams = URLSearchParams()
-    nilParams.append("key", nil as String?)
-    #expect(nilParams.description == "key")
+    nilParams.append("key", "")
+    #expect(nilParams.description == "key=")
   }
 
   @Test func urlSearchParamsEncoding() async throws {

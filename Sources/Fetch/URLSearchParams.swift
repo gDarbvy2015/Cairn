@@ -69,14 +69,13 @@ public struct URLSearchParams: Sendable, CustomStringConvertible {
   /// Example:
   /// ```swift
   /// var params = URLSearchParams("foo=1")
-  /// params.append("bar", 2)
+  /// params.append("bar", "2")
   /// print(params.description) // Output: "foo=1&bar=2"
   /// ```
-  public mutating func append(_ name: String, _ value: Any) {
+  public mutating func append(_ name: String, _ value: String) {
     guard !name.isEmpty else { return }
-    let encodedName = name.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? name
-    let encodedValue = String(describing: value).addingPercentEncoding(
-      withAllowedCharacters: .urlQueryAllowed)
+    let encodedName = name.addingPercentEncoding(withAllowedCharacters: ._urlQueryAllowed) ?? name
+    let encodedValue = value.addingPercentEncoding(withAllowedCharacters: ._urlQueryAllowed)
     items.append((encodedName, encodedValue))
   }
 
@@ -92,14 +91,13 @@ public struct URLSearchParams: Sendable, CustomStringConvertible {
   /// print(params.description) // Output: "bar=2"
   ///
   /// params = URLSearchParams("foo=1&bar=2&foo=3")
-  /// params.delete("foo", 1)
+  /// params.delete("foo", "1")
   /// print(params.description) // Output: "bar=2&foo=3"
   /// ```
-  public mutating func delete(_ name: String, _ value: Any? = nil) {
-    if let specificValue = value {
-      let valueStr = String(describing: specificValue)
+  public mutating func delete(_ name: String, _ value: String? = nil) {
+    if let value {
       items.removeAll { item in
-        item.0 == name && item.1 == valueStr
+        item.0 == name && item.1 == value
       }
     } else {
       items.removeAll { $0.0 == name }
@@ -200,4 +198,25 @@ public struct URLSearchParams: Sendable, CustomStringConvertible {
       }
     }.joined(separator: "&")
   }
+}
+
+extension CharacterSet {
+  /// Creates a CharacterSet from RFC 3986 allowed characters.
+  ///
+  /// RFC 3986 states that the following characters are "reserved" characters.
+  ///
+  /// - General Delimiters: ":", "#", "[", "]", "@", "?", "/"
+  /// - Sub-Delimiters: "!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "="
+  ///
+  /// In RFC 3986 - Section 3.4, it states that the "?" and "/" characters should not be escaped to allow
+  /// query strings to include a URL. Therefore, all "reserved" characters with the exception of "?" and "/"
+  /// should be percent-escaped in the query string.
+  static let _urlQueryAllowed: CharacterSet = {
+    let generalDelimitersToEncode = ":#[]@"  // does not include "?" or "/" due to RFC 3986 - Section 3.4
+    let subDelimitersToEncode = "!$&'()*+,;="
+    let encodableDelimiters = CharacterSet(
+      charactersIn: "\(generalDelimitersToEncode)\(subDelimitersToEncode)")
+
+    return CharacterSet.urlQueryAllowed.subtracting(encodableDelimiters)
+  }()
 }
