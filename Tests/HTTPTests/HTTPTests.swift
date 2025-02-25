@@ -1,5 +1,5 @@
 //
-//  FetchTests.swift
+//  HTTPTests.swift
 //  Fetch
 //
 //  Created by Guilherme Souza on 12/12/24.
@@ -11,7 +11,7 @@ import InlineSnapshotTesting
 import Testing
 
 @Suite
-struct FetchTests {
+struct HTTPTests {
   @Test func requestWithData() async throws {
     struct ExpectedPayload: Decodable {
       var method: String
