@@ -6,6 +6,7 @@
 //
 
 import ConcurrencyExtras
+import HTTPTypes
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
@@ -19,33 +20,33 @@ import ConcurrencyExtras
 
 /// Represents an HTTP response.
 public struct Response: Sendable {
-  /// The URL of the response.
-  public let url: URL
+
+  public var httpResponse: HTTPResponse
 
   /// The body of the response.
   public let body: Body
 
   /// A dictionary of HTTP headers received in the response.
-  public let headers: HTTPHeaders
+  public var headers: HTTPFields {
+    httpResponse.headerFields
+  }
 
   /// The HTTP status code of the response.
-  public let status: Int
+  public var status: HTTPResponse.Status { httpResponse.status }
 
-  public init(url: URL, body: Body, headers: HTTPHeaders, status: Int) {
-    self.url = url
+  public init(httpResponse: HTTPResponse, body: Body) {
+    self.httpResponse = httpResponse
     self.body = body
-    self.headers = headers
-    self.status = status
   }
 
   /// The HTTP status text of the response.
   public var statusText: String {
-    HTTPURLResponse.localizedString(forStatusCode: status)
+    status.reasonPhrase
   }
 
   /// Indicates whether the response status code is in the successful range (200-299).
   public var ok: Bool {
-    200..<300 ~= status
+    200..<300 ~= status.code
   }
 
   /// Converts the response body to a string.
@@ -89,7 +90,7 @@ public struct Response: Sendable {
 
   /// Decodes response body as a ``FormData``.
   public func formData() async throws -> FormData {
-    try await FormData.decode(from: body.collect(), contentType: headers["Content-Type"] ?? "")
+    try await FormData.decode(from: body.collect(), contentType: headers[.contentType] ?? "")
   }
 
   /// Decodes response as ``Data``.

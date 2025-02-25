@@ -5,10 +5,8 @@ import Testing
 
 @Test func textResponse() async throws {
   let stringResponse = Response(
-    url: URL(string: "https://api.example.com/data")!,
-    body: .string("string value"),
-    headers: [:],
-    status: 200
+    httpResponse: HTTPResponse(status: .ok),
+    body: .string("string value")
   )
 
   #expect(await stringResponse.text() == "string value")
@@ -16,10 +14,8 @@ import Testing
 
 @Test func decodeStringResponse() async throws {
   let stringResponse = Response(
-    url: URL(string: "https://api.example.com/data")!,
-    body: .string("string value"),
-    headers: [:],
-    status: 200
+    httpResponse: HTTPResponse(status: .ok),
+    body: .string("string value")
   )
 
   try #expect(await stringResponse.decode() as String == "string value")
@@ -27,10 +23,8 @@ import Testing
 
 @Test func decodeDataResponse() async throws {
   let stringResponse = Response(
-    url: URL(string: "https://api.example.com/data")!,
-    body: .string("string value"),
-    headers: [:],
-    status: 200
+    httpResponse: HTTPResponse(status: .ok),
+    body: .string("string value")
   )
 
   try #expect(await stringResponse.decode() as Data == Data("string value".utf8))
@@ -42,10 +36,8 @@ import Testing
   }
 
   let response = Response(
-    url: URL(string: "https://api.example.com/data")!,
-    body: .string(#"{ "value": "string value" }"#),
-    headers: [:],
-    status: 200
+    httpResponse: HTTPResponse(status: .ok),
+    body: .string(#"{ "value": "string value" }"#)
   )
 
   let json = try await response.decode() as JSON

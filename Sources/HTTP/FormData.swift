@@ -66,8 +66,8 @@ public struct FormData: Sendable {
 
     for bodyPart in bodyParts {
       data.append("--\(boundary)\r\n".data(using: .utf8)!)
-      for (key, value) in bodyPart.headers {
-        data.append("\(key): \(value)\r\n".data(using: .utf8)!)
+      for field in bodyPart.headers {
+        data.append("\(field.name): \(field.value)\r\n".data(using: .utf8)!)
       }
       data.append("\r\n".data(using: .utf8)!)
       data.append(bodyPart.data)
@@ -88,24 +88,24 @@ public struct FormData: Sendable {
     name: String,
     filename: String?,
     contentType: String?
-  ) -> HTTPHeaders {
-    var headers = HTTPHeaders()
+  ) -> HTTPFields {
+    var headers = HTTPFields()
 
     var disposition = "form-data; name=\"\(name)\""
     if let filename = filename {
       disposition += "; filename=\"\(filename)\""
     }
-    headers["Content-Disposition"] = disposition
+    headers[.contentDisposition] = disposition
 
     if let contentType = contentType {
-      headers["Content-Type"] = contentType
+      headers[.contentType] = contentType
     }
 
     return headers
   }
 
   struct BodyPart {
-    let headers: HTTPHeaders
+    let headers: HTTPFields
     let data: Data
   }
 }
@@ -166,13 +166,13 @@ extension FormData {
 
       // Parse headers (headers are always UTF-8)
       guard let headersString = String(data: headersData, encoding: .utf8) else { continue }
-      var headers = HTTPHeaders()
+      var headers = HTTPFields()
 
       let headerLines = headersString.components(separatedBy: "\r\n")
       for line in headerLines {
         let headerParts = line.split(separator: ":", maxSplits: 1).map(String.init)
         guard headerParts.count == 2 else { continue }
-        headers[headerParts[0].trimmingCharacters(in: .whitespaces)] =
+        headers[.init(headerParts[0].trimmingCharacters(in: .whitespaces))!] =
           headerParts[1].trimmingCharacters(in: .whitespaces)
       }
 

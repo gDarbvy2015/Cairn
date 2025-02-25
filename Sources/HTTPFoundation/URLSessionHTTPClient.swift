@@ -1,5 +1,7 @@
 import Foundation
 @_exported import HTTP
+import HTTPTypes
+import HTTPTypesFoundation
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
@@ -86,13 +88,12 @@ public struct URLSessionHTTPClient: HTTPClient {
   /// ```
   @discardableResult
   public func send(
-    _ request: Request
+    _ request: HTTPRequest,
+    body: HTTPRequest.Body?
   ) async throws -> Response {
-    var urlRequest = URLRequest(url: request.url)
-    urlRequest.httpMethod = request.method.rawValue
-    urlRequest.allHTTPHeaderFields = request.headers.dictionary
+    var urlRequest = URLRequest(httpRequest: request)!
 
-    if let body = request.body {
+    if let body {
       if case .url(let url) = body {
         let task = session.uploadTask(with: urlRequest, fromFile: url)
         return try await dataLoader.startUploadTask(
@@ -123,7 +124,7 @@ public struct URLSessionHTTPClient: HTTPClient {
   ///   - request: The `URLRequest` to modify with the encoded body.
   /// - Throws: An error if encoding fails or if the value type is not supported.
   private func encode(
-    _ value: Request.Body,
+    _ value: HTTPRequest.Body,
     in request: inout URLRequest
   ) throws -> Data? {
     switch value {

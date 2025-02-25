@@ -18,12 +18,18 @@ let package = Package(
     .library(name: "HTTPMock", targets: ["HTTPMock"]),
   ],
   dependencies: [
-    .package(url: "https://github.com/pointfreeco/swift-concurrency-extras.git", from: "1.0.0")
+    .package(url: "https://github.com/pointfreeco/swift-concurrency-extras.git", from: "1.0.0"),
+    .package(url: "https://github.com/apple/swift-http-types", from: "1.0.0"),
   ],
   targets: [
     .target(
       name: "HTTP",
-      dependencies: [.product(name: "ConcurrencyExtras", package: "swift-concurrency-extras")]),
+      dependencies: [
+        .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
+        .product(name: "HTTPTypes", package: "swift-http-types"),
+        .product(name: "HTTPTypesFoundation", package: "swift-http-types"),
+      ]
+    ),
     .testTarget(
       name: "HTTPTests",
       dependencies: [

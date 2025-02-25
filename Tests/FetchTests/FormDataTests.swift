@@ -26,7 +26,7 @@ import Testing
 
   #expect(encodedString.contains("name=\"image\""))
   #expect(encodedString.contains("filename=\"test.jpg\""))
-  #expect(encodedString.contains("content-type: image/jpeg"))
+  #expect(encodedString.contains("Content-Type: image/jpeg"))
   #expect(encodedString.contains(expectedImageData))
 }
 
@@ -114,8 +114,8 @@ import Testing
   // Verify the decoded data matches the original
   let decodedPart = decodedForm.bodyParts.first
   #expect(decodedPart != nil)
-  #expect(decodedPart?.headers["Content-Type"] == "application/octet-stream")
-  #expect(decodedPart?.headers["Content-Disposition"]?.contains("filename=\"test.bin\"") == true)
+  #expect(decodedPart?.headers[.contentType] == "application/octet-stream")
+  #expect(decodedPart?.headers[.contentDisposition]?.contains("filename=\"test.bin\"") == true)
   #expect(decodedPart?.data == binaryData)
 }
 

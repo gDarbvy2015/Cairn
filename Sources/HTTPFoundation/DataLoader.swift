@@ -4,6 +4,8 @@
 
 import Foundation
 import HTTP
+import HTTPTypes
+import HTTPTypesFoundation
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
@@ -128,12 +130,12 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
       let body = handler.body ?? .init()
       body.finalize()
 
-      if let response = task.response as? HTTPURLResponse, error == nil {
+      if let response = task.response as? HTTPURLResponse, let httpResponse = response.httpResponse,
+        error == nil
+      {
         let response = Response(
-          url: response.url!,
-          body: body,
-          headers: HTTPHeaders(response.allHeaderFields as! [String: String]),
-          status: response.statusCode
+          httpResponse: httpResponse,
+          body: body
         )
         handler.completion?(.success(response))
       } else {
@@ -141,6 +143,7 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
       }
     case let handler as DownloadTaskHandler:
       if let location = handler.location, let response = task.response as? HTTPURLResponse,
+        let httpResponse = response.httpResponse,
         error == nil
       {
         do {
@@ -150,10 +153,8 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
           body.finalize()
 
           let response = Response(
-            url: response.url!,
-            body: body,
-            headers: HTTPHeaders(response.allHeaderFields as! [String: String]),
-            status: response.statusCode
+            httpResponse: httpResponse,
+            body: body
           )
           handler.completion?(.success(response))
         } catch {

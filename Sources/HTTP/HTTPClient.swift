@@ -1,9 +1,11 @@
 import Foundation
+@_exported import HTTPTypes
+@_exported import HTTPTypesFoundation
 
 /// A type for making HTTP requests with an intuitive API inspired by the web Fetch API.
 public protocol HTTPClient: Sendable {
   @discardableResult
-  func send(_ request: Request) async throws -> Response
+  func send(_ request: HTTPRequest, body: HTTPRequest.Body?) async throws -> Response
 }
 
 extension HTTPClient {
@@ -28,9 +30,9 @@ extension HTTPClient {
   @discardableResult
   public func send(
     _ url: String,
-    method: HTTPMethod = .get,
-    body: Request.Body? = nil,
-    headers: HTTPHeaders = [:]
+    method: HTTPRequest.Method = .get,
+    body: HTTPRequest.Body? = nil,
+    headers: HTTPFields = [:]
   ) async throws -> Response {
     try await self.send(
       URL(string: url)!,
@@ -63,79 +65,75 @@ extension HTTPClient {
   @discardableResult
   public func send(
     _ url: URL,
-    method: HTTPMethod = .get,
-    body: Request.Body? = nil,
-    headers: HTTPHeaders = [:]
+    method: HTTPRequest.Method = .get,
+    body: HTTPRequest.Body? = nil,
+    headers: HTTPFields = [:]
   ) async throws -> Response {
     try await self.send(
-      Request(
-        url: url,
-        method: method,
-        body: body,
-        headers: headers
-      )
+      HTTPRequest(method: method, url: url, headerFields: headers),
+      body: body
     )
   }
 
   @discardableResult
-  public func get(_ url: URL, headers: HTTPHeaders = [:]) async throws -> Response {
+  public func get(_ url: URL, headers: HTTPFields = [:]) async throws -> Response {
     try await self.send(url, method: .get, headers: headers)
   }
 
   @discardableResult
-  public func get(_ url: String, headers: HTTPHeaders = [:]) async throws -> Response {
+  public func get(_ url: String, headers: HTTPFields = [:]) async throws -> Response {
     try await self.send(URL(string: url)!, method: .get, headers: headers)
   }
 
   @discardableResult
-  public func post(_ url: String, body: Request.Body?, headers: HTTPHeaders = [:]) async throws
+  public func post(_ url: String, body: HTTPRequest.Body?, headers: HTTPFields = [:]) async throws
     -> Response
   {
     try await self.send(URL(string: url)!, method: .post, body: body, headers: headers)
   }
 
   @discardableResult
-  public func post(_ url: URL, body: Request.Body?, headers: HTTPHeaders = [:]) async throws
+  public func post(_ url: URL, body: HTTPRequest.Body?, headers: HTTPFields = [:]) async throws
     -> Response
   {
     try await self.send(url, method: .post, body: body, headers: headers)
   }
 
   @discardableResult
-  public func put(_ url: String, body: Request.Body?, headers: HTTPHeaders = [:]) async throws
+  public func put(_ url: String, body: HTTPRequest.Body?, headers: HTTPFields = [:]) async throws
     -> Response
   {
     try await self.send(URL(string: url)!, method: .put, body: body, headers: headers)
   }
 
   @discardableResult
-  public func put(_ url: URL, body: Request.Body?, headers: HTTPHeaders = [:]) async throws
+  public func put(_ url: URL, body: HTTPRequest.Body?, headers: HTTPFields = [:]) async throws
     -> Response
   {
     try await self.send(url, method: .put, body: body, headers: headers)
   }
 
   @discardableResult
-  public func patch(_ url: String, body: Request.Body?, headers: HTTPHeaders = [:]) async throws
+  public func patch(_ url: String, body: HTTPRequest.Body?, headers: HTTPFields = [:]) async throws
     -> Response
   {
     try await self.send(URL(string: url)!, method: .patch, body: body, headers: headers)
   }
 
   @discardableResult
-  public func patch(_ url: URL, body: Request.Body?, headers: HTTPHeaders = [:]) async throws
+  public func patch(_ url: URL, body: HTTPRequest.Body?, headers: HTTPFields = [:]) async throws
     -> Response
   {
     try await self.send(url, method: .patch, body: body, headers: headers)
   }
 
   @discardableResult
-  public func delete(_ url: String, headers: HTTPHeaders = [:]) async throws -> Response {
+  public func delete(_ url: String, headers: HTTPFields = [:]) async throws -> Response {
     try await self.send(URL(string: url)!, method: .delete, headers: headers)
   }
 
   @discardableResult
-  public func delete(_ url: URL, headers: HTTPHeaders = [:]) async throws -> Response {
+  public func delete(_ url: URL, headers: HTTPFields = [:]) async throws -> Response {
     try await self.send(url, method: .delete, headers: headers)
   }
 }
