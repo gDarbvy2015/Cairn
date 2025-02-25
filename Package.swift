@@ -19,6 +19,8 @@ let package = Package(
   ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-concurrency-extras.git", from: "1.0.0"),
+    .package(url: "https://github.com/pointfreeco/swift-snapshot-testing", from: "1.0.0"),
+    .package(url: "https://github.com/pointfreeco/xctest-dynamic-overlay", from: "1.0.0"),
     .package(url: "https://github.com/apple/swift-http-types", from: "1.0.0"),
   ],
   targets: [
@@ -26,6 +28,7 @@ let package = Package(
       name: "HTTP",
       dependencies: [
         .product(name: "ConcurrencyExtras", package: "swift-concurrency-extras"),
+        .product(name: "IssueReporting", package: "xctest-dynamic-overlay"),
         .product(name: "HTTPTypes", package: "swift-http-types"),
         .product(name: "HTTPTypesFoundation", package: "swift-http-types"),
       ]
@@ -36,6 +39,7 @@ let package = Package(
         "HTTP",
         "HTTPFoundation",
         "HTTPMock",
+        .product(name: "InlineSnapshotTesting", package: "swift-snapshot-testing"),
       ]
     ),
     .target(

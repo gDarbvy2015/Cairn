@@ -20,13 +20,13 @@ import HTTPTypes
 
 /// Represents an HTTP response.
 public struct Response: Sendable {
-
+  /// The HTTP response.
   public var httpResponse: HTTPResponse
 
   /// The body of the response.
   public let body: Body
 
-  /// A dictionary of HTTP headers received in the response.
+  /// The headers of the response.
   public var headers: HTTPFields {
     httpResponse.headerFields
   }
@@ -84,20 +84,24 @@ public struct Response: Sendable {
   }
 
   /// Decodes the response body as a JSON using `JSONSerialization`.
+  /// - Returns: The response body as a JSON object.
   public func json() async throws -> Any {
     try await JSONSerialization.jsonObject(with: body.collect())
   }
 
   /// Decodes response body as a ``FormData``.
+  /// - Returns: The response body as a ``FormData``.
   public func formData() async throws -> FormData {
     try await FormData.decode(from: body.collect(), contentType: headers[.contentType] ?? "")
   }
 
-  /// Decodes response as ``Data``.
+  /// Decodes response body as ``Data``.
+  /// - Returns: The response body as ``Data``.
   public func data() async -> Data {
     await body.collect()
   }
 
+  /// A type that represents the body of an HTTP response.
   public final class Body: AsyncSequence, Sendable {
     public typealias AsyncIterator = AsyncStream<Data>.Iterator
     public typealias Element = Data
@@ -116,6 +120,8 @@ public struct Response: Sendable {
       stream.makeAsyncIterator()
     }
 
+    /// Collects the response body as a ``Data``.
+    /// - Returns: The response body as ``Data``.
     public func collect() async -> Data {
       if let data = data.value {
         return data
@@ -137,13 +143,21 @@ public struct Response: Sendable {
 }
 
 extension Response.Body {
-  public static func string(_ string: String, using encoding: String.Encoding = .utf8) -> Self {
+  /// Creates a new ``Body`` instance with the given string.
+  /// - Parameters:
+  ///   - string: The string to append to the body.
+  /// - Returns: A new ``Body`` instance with the given string.
+  public static func string(_ string: String) -> Self {
     let body = Self()
-    body.append(string.data(using: encoding)!)
+    body.append(string.data(using: .utf8)!)
     body.finalize()
     return body
   }
 
+  /// Creates a new ``Body`` instance with the given data.
+  /// - Parameters:
+  ///   - data: The data to append to the body.
+  /// - Returns: A new ``Body`` instance with the given data.
   public static func data(_ data: Data) -> Self {
     let body = Self()
     body.append(data)
@@ -151,7 +165,27 @@ extension Response.Body {
     return body
   }
 
-  public static func json(_ value: any Sendable) throws -> Self {
+  /// Creates a new ``Body`` instance with the given JSON value.
+  /// - Parameters:
+  ///   - value: The JSON value to append to the body.
+  /// - Returns: A new ``Body`` instance with the given JSON value.
+  public static func json(_ value: Any) throws -> Self {
     data(try JSONSerialization.data(withJSONObject: value))
+  }
+
+  /// Creates a new ``Body`` instance with the given encodable value.
+  /// - Parameters:
+  ///   - value: The encodable value to append to the body.
+  /// - Returns: A new ``Body`` instance with the given encodable value.
+  public static func encodable(_ value: any HTTPRequestEncodableBody) throws -> Self {
+    data(try type(of: value).encoder.encode(value))
+  }
+
+  /// Creates a new ``Body`` instance with the given encodable value.
+  /// - Parameters:
+  ///   - value: The encodable value to append to the body.
+  /// - Returns: A new ``Body`` instance with the given encodable value.
+  public static func encodable(_ value: any Encodable) throws -> Self {
+    data(try JSONEncoder().encode(value))
   }
 }

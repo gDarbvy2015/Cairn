@@ -43,3 +43,37 @@ import Testing
   let json = try await response.decode() as JSON
   #expect(json.value == "string value")
 }
+
+@Test func responseFromHTTPRequestEncodableBody() async throws {
+  struct Value: HTTPRequestEncodableBody, Decodable {
+    let customKey: String
+
+    static var encoder: JSONEncoder {
+      let encoder = JSONEncoder()
+      encoder.keyEncodingStrategy = .convertToSnakeCase
+      return encoder
+    }
+  }
+
+  let response = Response(
+    httpResponse: HTTPResponse(status: .ok),
+    body: try .encodable(Value(customKey: "string value"))
+  )
+
+  let json = try await response.json() as? [String: String]
+  #expect(json?["custom_key"] == "string value")
+}
+
+@Test func responseFromEncodable() async throws {
+  struct Value: Encodable {
+    let customKey: String
+  }
+
+  let response = Response(
+    httpResponse: HTTPResponse(status: .ok),
+    body: try .encodable(Value(customKey: "string value"))
+  )
+
+  let json = try await response.json() as? [String: String]
+  #expect(json?["customKey"] == "string value")
+}

@@ -2,6 +2,7 @@ import Foundation
 @_exported import HTTP
 import HTTPTypes
 import HTTPTypesFoundation
+import IssueReporting
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
@@ -89,12 +90,12 @@ public struct URLSessionHTTPClient: HTTPClient {
   @discardableResult
   public func send(
     _ request: HTTPRequest,
-    body: HTTPRequest.Body?
+    body: Any?
   ) async throws -> Response {
     var urlRequest = URLRequest(httpRequest: request)!
 
     if let body {
-      if case .url(let url) = body {
+      if let url = body as? URL {
         let task = session.uploadTask(with: urlRequest, fromFile: url)
         return try await dataLoader.startUploadTask(
           task, session: session, delegate: nil)
@@ -105,7 +106,11 @@ public struct URLSessionHTTPClient: HTTPClient {
           return try await dataLoader.startUploadTask(
             task, session: session, delegate: nil)
         } else {
-          fatalError("Bad request")
+          reportIssue("Malformed request")
+          return Response(
+            httpResponse: HTTPResponse(status: .badRequest),
+            body: .data(Data())
+          )
         }
       }
     } else {
@@ -124,43 +129,61 @@ public struct URLSessionHTTPClient: HTTPClient {
   ///   - request: The `URLRequest` to modify with the encoded body.
   /// - Throws: An error if encoding fails or if the value type is not supported.
   private func encode(
-    _ value: HTTPRequest.Body,
+    _ value: Any,
     in request: inout URLRequest
   ) throws -> Data? {
     switch value {
-    case let .data(data):
+    case let data as Data:
+      if request.value(forHTTPHeaderField: "Content-Type") == nil {
+        request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+      }
       return data
 
-    case let .string(str, encoding):
-      return str.data(using: encoding)!
+    case let str as String:
+      if request.value(forHTTPHeaderField: "Content-Type") == nil {
+        request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+      }
+      return Data(str.utf8)
 
-    case let .url(url):
+    case let url as URL:
       return try Data(contentsOf: url)
 
-    case let .formData(formData):
+    case let formData as FormData:
       if request.value(forHTTPHeaderField: "Content-Type") == nil {
         request.setValue(formData.contentType, forHTTPHeaderField: "Content-Type")
       }
       return formData.encode()
 
-    case let .urlSearchParams(searchParams):
+    case let searchParams as URLSearchParams:
       if request.value(forHTTPHeaderField: "Content-Type") == nil {
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
       }
       return searchParams.description.data(using: .utf8)!
 
-    case let .json(value):
-      if request.value(forHTTPHeaderField: "Content-Type") == nil {
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-      }
-      return try JSONSerialization.data(withJSONObject: value)
-
-    case let .encodable(value, encoder):
+    case let value as any HTTPRequestEncodableBody:
       if request.value(forHTTPHeaderField: "Content-Type") == nil {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       }
 
-      return try (encoder ?? self.encoder ?? JSONEncoder()).encode(value)
+      return try type(of: value).encoder.encode(value)
+
+    case let value as any Encodable:
+      if request.value(forHTTPHeaderField: "Content-Type") == nil {
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+      }
+
+      return try (encoder ?? JSONEncoder()).encode(value)
+
+    default:
+      if JSONSerialization.isValidJSONObject(value) {
+        if request.value(forHTTPHeaderField: "Content-Type") == nil {
+          request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        }
+        return try JSONSerialization.data(withJSONObject: value)
+      } else {
+        reportIssue("Unsupported body type: \(type(of: value))")
+        return nil
+      }
     }
   }
 }

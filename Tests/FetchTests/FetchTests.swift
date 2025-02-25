@@ -7,6 +7,7 @@
 
 import Foundation
 import HTTPFoundation
+import InlineSnapshotTesting
 import Testing
 
 @Suite
@@ -20,15 +21,14 @@ struct FetchTests {
 
     let response = try await http.post(
       "https://httpbin.org/anything",
-      body: .data(Data("Hello World".utf8)),
-      headers: [.contentType: "text/plain"]
+      body: Data("Hello World".utf8)
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
 
     #expect(payload.method == "POST")
     #expect(payload.data == "Hello World")
-    #expect(payload.headers["Content-Type"] == "text/plain")
+    #expect(payload.headers["Content-Type"] == "application/octet-stream")
   }
 
   @Test func requestWithString() async throws {
@@ -42,13 +42,13 @@ struct FetchTests {
 
     let response = try await http.post(
       "https://httpbin.org/anything",
-      body: .string(body),
-      headers: [.contentType: "application/octet-stream"]
+      body: body
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
 
     #expect(payload.data == body)
+    #expect(payload.headers["Content-Type"] == "text/plain")
   }
 
   @Test func requestWithFormData() async throws {
@@ -59,17 +59,17 @@ struct FetchTests {
     }
 
     var body = FormData()
-    try body.append("file", .string("Hello World"))
+    try body.append("file", "Hello World")
 
     let response = try await http.post(
       "https://httpbin.org/anything",
-      body: .formData(body),
-      headers: [.contentType: body.contentType]
+      body: body
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
 
     #expect(payload.form == ["file": "Hello World"])
+    #expect(payload.headers["Content-Type"] == body.contentType)
   }
 
   @Test func requestWithURLSearchParams() async throws {
@@ -85,13 +85,13 @@ struct FetchTests {
 
     let response = try await http.post(
       "https://httpbin.org/anything",
-      body: .urlSearchParams(body),
-      headers: [.contentType: "application/x-www-form-urlencoded"]
+      body: body
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
 
     #expect(payload.form == ["username": "admin", "password": "pass123"])
+    #expect(payload.headers["Content-Type"] == "application/x-www-form-urlencoded")
   }
 
   @Test func requestWithJSONObject() async throws {
@@ -111,12 +111,11 @@ struct FetchTests {
         "username": "admin",
         "password": "pass123",
         "age": 18,
-      ] as [String: any Sendable]
+      ] as [String: Any]
 
     let response = try await http.post(
       "https://httpbin.org/anything",
-      body: .json(body),
-      headers: [.contentType: "application/json"]
+      body: body
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
@@ -129,6 +128,7 @@ struct FetchTests {
           age: 18
         )
     )
+    #expect(payload.headers["Content-Type"] == "application/json")
   }
 
   @Test func requestWithEncodable() async throws {
@@ -149,13 +149,13 @@ struct FetchTests {
 
     let response = try await http.post(
       "https://httpbin.org/anything",
-      body: .encodable(body),
-      headers: [.contentType: "application/json"]
+      body: body
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
 
     #expect(payload.json == body)
+    #expect(payload.headers["Content-Type"] == "application/json")
   }
 
   @Test func streamResponse() async throws {
@@ -170,5 +170,4 @@ struct FetchTests {
     }
     #expect(result.count == 20)
   }
-
 }
