@@ -64,3 +64,8 @@ func HashFile(path string) (string, uint64, error) {
 	buf := make([]byte, 64*1024)
 	var total uint64
 	for {
+		n, err := f.Read(buf)
+		if n > 0 {
+			h.Update(buf[:n])
+			total += uint64(n)
+		}
