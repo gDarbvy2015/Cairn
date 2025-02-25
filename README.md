@@ -1,9 +1,7 @@
-# Fetch API
+# HTTP
 
-The `Fetch` package provides a Swift interface for making HTTP requests and
-processing responses, inspired by the
-[Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) commonly
-used in web development.
+The `HTTP` package provides a Swift interface for making HTTP requests and
+processing responses.
 
 ## Features
 
@@ -21,59 +19,56 @@ used in web development.
 Add the following line to your `Package.swift` file:
 
 ```swift
-.package(url: "https://github.com/grdsdev/swift-fetch.git", from: "0.0.1")
+.package(url: "https://github.com/grdsdev/swift-http.git", from: "0.0.1")
 ```
 
-Then, add "Fetch" to your target dependencies.
+Then, add "HTTP" to your target dependencies.
 
 ## Usage
 
 ### Basic GET Request
 
 ```swift
-import Fetch
+import HTTP
+import HTTPFoundation
 
-let response = try await fetch("https://api.example.com/data")
+let response = try await http.get("https://api.example.com/data")
 let json = try await response.json()
 ```
 
 ### POST Request with JSON Body
 
 ```swift
-import Fetch
+import HTTP
+import HTTPFoundation
 
-let response = try await fetch(
+let response = try await http.post(
   "https://api.example.com/users", 
-  options: RequestOptions(
-    method: "POST",
-    body: ["name": "John Doe", "age": 30],
-    headers: ["Content-Type": "application/json"]
-  )
+  body: ["name": "John Doe", "age": 30]
 )
 ```
 
 ### Multipart Form Data
 
 ```swift
-import Fetch
+import HTTP
+import HTTPFoundation
 
 var formData = FormData()
 formData.append("username", "johndoe")
 formData.append("avatar", imageData, filename: "avatar.jpg", contentType: "image/jpeg")
 
-let response = try await fetch(
+let response = try await http.post(
   "https://api.example.com/upload", 
-  options: RequestOptions(
-    method: "POST", 
-    body: formData
-  )
+  body: formData
 )
 ```
 
 ### URL Search Parameters
 
 ```swift
-import Fetch
+import HTTP
+
 var params = URLSearchParams("https://example.com?foo=1&bar=2")
 params.append("baz", "3")
 print(params.description) // Output: foo=1&bar=2&baz=3
@@ -82,9 +77,10 @@ print(params.description) // Output: foo=1&bar=2&baz=3
 ### Streamed Responses
 
 ```swift
-import Fetch
+import HTTP
+import HTTPFoundation
 
-let response = try await fetch("https://api.example.com/stream")
+let response = try await http.get("https://api.example.com/stream")
 
 for await chunk in response.body {
   // handle chunk of Data
@@ -98,8 +94,8 @@ source code.
 
 ## Requirements
 
-- Swift 6.0+
-- macOS 12.0+ or iOS 13.0+
+- Swift 5.9+
+- macOS 10.15+ or iOS 13.0+
 
 ## License
 
