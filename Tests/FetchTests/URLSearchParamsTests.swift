@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import Fetch
+@testable import HTTP
 
 @Suite
 struct URLSearchParamsTests {

@@ -1,13 +1,13 @@
 //
-//  FetchMock.swift
+//  HTTPClientMock.swift
 //  Fetch
 //
 //  Created by Guilherme Souza on 13/01/25.
 //
 
-import Fetch
+import HTTP
 
-public actor FetchMock: Fetch {
+public actor HTTPClientMock: HTTPClient {
 
   public init() {}
 
@@ -47,7 +47,7 @@ public actor FetchMock: Fetch {
     return self
   }
 
-  public func callAsFunction(_ request: Request) async throws -> Response {
+  public func send(_ request: Request) async throws -> Response {
     guard let mock = findMock(for: request) else {
       fatalError("Mock not found.")
     }

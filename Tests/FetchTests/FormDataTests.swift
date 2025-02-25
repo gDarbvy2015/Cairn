@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import Fetch
+@testable import HTTP
 
 @Test func testAppendStringValue() throws {
   var formData = FormData()
@@ -26,7 +26,7 @@ import Testing
 
   #expect(encodedString.contains("name=\"image\""))
   #expect(encodedString.contains("filename=\"test.jpg\""))
-  #expect(encodedString.contains("Content-Type: image/jpeg"))
+  #expect(encodedString.contains("content-type: image/jpeg"))
   #expect(encodedString.contains(expectedImageData))
 }
 

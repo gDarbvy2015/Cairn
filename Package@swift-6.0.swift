@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-  name: "Fetch",
+  name: "HTTP",
   platforms: [
     .iOS(.v13),
     .macCatalyst(.v13),
@@ -13,32 +13,32 @@ let package = Package(
     .tvOS(.v13),
   ],
   products: [
-    .library(name: "Fetch", targets: ["Fetch"]),
-    .library(name: "FetchFoundation", targets: ["FetchFoundation"]),
-    .library(name: "FetchMock", targets: ["FetchMock"]),
+    .library(name: "HTTP", targets: ["HTTP"]),
+    .library(name: "HTTPFoundation", targets: ["HTTPFoundation"]),
+    .library(name: "HTTPMock", targets: ["HTTPMock"]),
   ],
   dependencies: [
     .package(url: "https://github.com/pointfreeco/swift-concurrency-extras.git", from: "1.0.0")
   ],
   targets: [
     .target(
-      name: "Fetch",
+      name: "HTTP",
       dependencies: [.product(name: "ConcurrencyExtras", package: "swift-concurrency-extras")]),
     .testTarget(
-      name: "FetchTests",
+      name: "HTTPTests",
       dependencies: [
-        "Fetch",
-        "FetchFoundation",
-        "FetchMock",
+        "HTTP",
+        "HTTPFoundation",
+        "HTTPMock",
       ]
     ),
     .target(
-      name: "FetchFoundation",
+      name: "HTTPFoundation",
       dependencies: [
-        "Fetch"
+        "HTTP"
       ]
     ),
-    .target(name: "FetchMock", dependencies: ["Fetch"]),
+    .target(name: "HTTPMock", dependencies: ["HTTP"]),
   ],
   swiftLanguageModes: [.v6]
 )

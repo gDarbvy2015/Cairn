@@ -88,8 +88,8 @@ public struct FormData: Sendable {
     name: String,
     filename: String?,
     contentType: String?
-  ) -> [String: String] {
-    var headers: [String: String] = [:]
+  ) -> HTTPHeaders {
+    var headers = HTTPHeaders()
 
     var disposition = "form-data; name=\"\(name)\""
     if let filename = filename {
@@ -105,7 +105,7 @@ public struct FormData: Sendable {
   }
 
   struct BodyPart {
-    let headers: [String: String]
+    let headers: HTTPHeaders
     let data: Data
   }
 }
@@ -166,7 +166,7 @@ extension FormData {
 
       // Parse headers (headers are always UTF-8)
       guard let headersString = String(data: headersData, encoding: .utf8) else { continue }
-      var headers: [String: String] = [:]
+      var headers = HTTPHeaders()
 
       let headerLines = headersString.components(separatedBy: "\r\n")
       for line in headerLines {

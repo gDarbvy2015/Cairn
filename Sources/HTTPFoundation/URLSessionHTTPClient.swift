@@ -1,15 +1,15 @@
-@_exported import Fetch
 import Foundation
+@_exported import HTTP
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
 #endif
 
 /// A global instance of `Fetch` for convenience.
-public let fetch: any Fetch = URLSessionFetch()
+public let http: any HTTPClient = URLSessionHTTPClient()
 
 /// A ``Fetch`` implementation that uses `URLSession`.
-public struct URLSessionFetch: Fetch {
+public struct URLSessionHTTPClient: HTTPClient {
   /// Configuration options for the Fetch instance.
   public struct Configuration {
     /// The `URLSessionConfiguration` to use for network requests.
@@ -85,14 +85,14 @@ public struct URLSessionFetch: Fetch {
   /// }
   /// ```
   @discardableResult
-  public func callAsFunction(
+  public func send(
     _ request: Request
   ) async throws -> Response {
     var urlRequest = URLRequest(url: request.url)
-    urlRequest.httpMethod = request.options.method.rawValue
-    urlRequest.allHTTPHeaderFields = request.options.headers.dictionary
+    urlRequest.httpMethod = request.method.rawValue
+    urlRequest.allHTTPHeaderFields = request.headers.dictionary
 
-    if let body = request.options.body {
+    if let body = request.body {
       if case .url(let url) = body {
         let task = session.uploadTask(with: urlRequest, fromFile: url)
         return try await dataLoader.startUploadTask(

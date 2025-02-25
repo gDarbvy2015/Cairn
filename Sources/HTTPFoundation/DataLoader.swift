@@ -2,8 +2,8 @@
 //
 // Copyright (c) 2021-2024 Alexander Grebenyuk (github.com/kean).
 
-import Fetch
 import Foundation
+import HTTP
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking

@@ -1,7 +1,7 @@
 import Foundation
 import Testing
 
-@testable import Fetch
+@testable import HTTP
 
 @Test func textResponse() async throws {
   let stringResponse = Response(

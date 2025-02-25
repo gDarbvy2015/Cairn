@@ -5,13 +5,13 @@
 //  Created by Guilherme Souza on 14/01/25.
 //
 
-extension FetchMock {
+extension HTTPClientMock {
   public struct Match<Value: Sendable>: Sendable {
     var matches: @Sendable (Value?) -> Bool
   }
 }
 
-extension FetchMock.Match {
+extension HTTPClientMock.Match {
   /// Matches any value.
   public static var any: Self { .init { _ in true } }
 

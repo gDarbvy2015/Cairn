@@ -1,6 +1,6 @@
 import Testing
 
-@testable import Fetch
+@testable import HTTP
 
 @Suite struct HTTPHeadersTests {
   @Test func initEmpty() {

@@ -5,8 +5,8 @@
 //  Created by Guilherme Souza on 12/12/24.
 //
 
-import FetchFoundation
 import Foundation
+import HTTPFoundation
 import Testing
 
 @Suite
@@ -18,13 +18,10 @@ struct FetchTests {
       let headers: [String: String]
     }
 
-    let response = try await fetch(
+    let response = try await http.post(
       "https://httpbin.org/anything",
-      options: RequestOptions(
-        method: .post,
-        body: .data(Data("Hello World".utf8)),
-        headers: ["Content-Type": "text/plain"]
-      )
+      body: .data(Data("Hello World".utf8)),
+      headers: ["Content-Type": "text/plain"]
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
@@ -43,13 +40,10 @@ struct FetchTests {
 
     let body = "Hello World"
 
-    let response = try await fetch(
+    let response = try await http.post(
       "https://httpbin.org/anything",
-      options: RequestOptions(
-        method: .post,
-        body: .string(body),
-        headers: ["Content-Type": "application/octet-stream"]
-      )
+      body: .string(body),
+      headers: ["Content-Type": "application/octet-stream"]
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
@@ -67,13 +61,10 @@ struct FetchTests {
     var body = FormData()
     try body.append("file", .string("Hello World"))
 
-    let response = try await fetch(
+    let response = try await http.post(
       "https://httpbin.org/anything",
-      options: RequestOptions(
-        method: .post,
-        body: .formData(body),
-        headers: ["Content-Type": body.contentType]
-      )
+      body: .formData(body),
+      headers: ["Content-Type": body.contentType]
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
@@ -92,13 +83,10 @@ struct FetchTests {
     body.append("username", "admin")
     body.append("password", "pass123")
 
-    let response = try await fetch(
+    let response = try await http.post(
       "https://httpbin.org/anything",
-      options: RequestOptions(
-        method: .post,
-        body: .urlSearchParams(body),
-        headers: ["Content-Type": "application/x-www-form-urlencoded"]
-      )
+      body: .urlSearchParams(body),
+      headers: ["Content-Type": "application/x-www-form-urlencoded"]
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
@@ -125,13 +113,10 @@ struct FetchTests {
         "age": 18,
       ] as [String: any Sendable]
 
-    let response = try await fetch(
+    let response = try await http.post(
       "https://httpbin.org/anything",
-      options: RequestOptions(
-        method: .post,
-        body: .json(body),
-        headers: ["Content-Type": "application/json"]
-      )
+      body: .json(body),
+      headers: ["Content-Type": "application/json"]
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
@@ -162,13 +147,10 @@ struct FetchTests {
       password: "pass123"
     )
 
-    let response = try await fetch(
+    let response = try await http.post(
       "https://httpbin.org/anything",
-      options: RequestOptions(
-        method: .post,
-        body: .encodable(body),
-        headers: ["Content-Type": "application/json"]
-      )
+      body: .encodable(body),
+      headers: ["Content-Type": "application/json"]
     )
 
     let payload = try await response.decode(as: ExpectedPayload.self)
@@ -177,7 +159,7 @@ struct FetchTests {
   }
 
   @Test func streamResponse() async throws {
-    let response = try await fetch("https://httpbin.org/stream-bytes/10")
+    let response = try await http.get("https://httpbin.org/stream-bytes/10")
 
     var result = ""
     for await chunk in response.body {
