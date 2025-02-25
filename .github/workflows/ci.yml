@@ -28,6 +28,7 @@ jobs:
     - name: Run ${{ matrix.config }} tests
       run: swift test -c ${{ matrix.config }} --enable-code-coverage
     - name: Upload coverage
+      if: ${{ matrix.config }} == 'debug'
       uses: vapor/swift-codecov-action@main
       with:
         codecov_token: ${{ secrets.CODECOV_TOKEN }}
