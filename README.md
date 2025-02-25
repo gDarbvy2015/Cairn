@@ -1,4 +1,5 @@
 # HTTP
+[![codecov](https://codecov.io/gh/grdsdev/swift-http/graph/badge.svg?token=E4i22yGg9o)](https://codecov.io/gh/grdsdev/swift-http)
 
 The `HTTP` package provides a Swift interface for making HTTP requests and
 processing responses.
