@@ -96,6 +96,10 @@ public struct URLSessionHTTPClient: HTTPClient {
 
     if let body {
       if let url = body as? URL {
+        if urlRequest.value(forHTTPHeaderField: "Content-Type") == nil {
+          let mimeType = FormData.mimeType(forPathExtension: url.pathExtension)
+          urlRequest.setValue(mimeType, forHTTPHeaderField: "Content-Type")
+        }
         let task = session.uploadTask(with: urlRequest, fromFile: url)
         return try await dataLoader.startUploadTask(
           task, session: session, delegate: nil)
@@ -145,8 +149,8 @@ public struct URLSessionHTTPClient: HTTPClient {
       }
       return Data(str.utf8)
 
-    case let url as URL:
-      return try Data(contentsOf: url)
+    case is URL:
+      fatalError("URL body should be handled before reaching this point.")
 
     case let formData as FormData:
       if request.value(forHTTPHeaderField: "Content-Type") == nil {
@@ -172,7 +176,7 @@ public struct URLSessionHTTPClient: HTTPClient {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       }
 
-      return try (encoder ?? JSONEncoder()).encode(value)
+      return try (encoder ?? JSONEncoder.default).encode(value)
 
     default:
       if JSONSerialization.isValidJSONObject(value) {

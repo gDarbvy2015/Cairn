@@ -9,27 +9,34 @@ public struct FormData: Sendable {
 
   /// Initializes a new FormData instance with a random boundary.
   /// The boundary is used to separate different parts of the multipart form data.
-  public init() {
-    let first = UInt32.random(in: UInt32.min...UInt32.max)
-    let second = UInt32.random(in: UInt32.min...UInt32.max)
-    self.boundary = String(format: "dev.grds.fetch.boundary.%08x%08x", first, second)
+  public init(boundary: String? = nil) {
+    if let boundary {
+      self.boundary = boundary
+    } else {
+      let first = UInt32.random(in: UInt32.min...UInt32.max)
+      let second = UInt32.random(in: UInt32.min...UInt32.max)
+      self.boundary = String(format: "dev.grds.fetch.boundary.%08x%08x", first, second)
+    }
   }
 
   /// Adds a new part to the multipart form data.
   /// - Parameters:
   ///   - name: The name of the form field.
-  ///   - value: The value of the form field. Can be a String, Data, URL, URLSearchParams, or any other type that can be encoded to Data.
+  ///   - value: The value of the form field. Supported types include `String`, `Data`, `URL`, `URLSearchParams`, `HTTPRequestEncodableBody`, `Encodable`, or any valid `JSON` object.
   ///   - filename: An optional filename for file uploads. If provided, it will be included in the Content-Disposition header.
   ///   - contentType: An optional MIME type for the part. If provided, it will be included as a Content-Type header.
   /// - Throws: An error if the value cannot be converted to Data or if the value type is not supported.
+  /// - Note: If `filename` or `contentType` are not provided, they will be inferred based on the `value` when possible.
   public mutating func append(
     _ name: String,
     _ value: Any,
     filename: String? = nil,
     contentType: String? = nil
   ) throws {
-    let headers = createHeaders(name: name, filename: filename, contentType: contentType)
     let data: Data
+
+    var filename = filename
+    var contentType = contentType
 
     switch value {
     case let d as Data:
@@ -37,13 +44,21 @@ public struct FormData: Sendable {
     case let str as String:
       data = Data(str.utf8)
     case let url as URL:
+      if contentType == nil {
+        contentType = FormData.mimeType(forPathExtension: url.pathExtension)
+      }
+
+      if filename == nil {
+        filename = url.lastPathComponent
+      }
+
       data = try Data(contentsOf: url)
     case let searchParams as URLSearchParams:
       data = Data(searchParams.description.utf8)
     case let value as any HTTPRequestEncodableBody:
       data = try type(of: value).encoder.encode(value)
     case let value as any Encodable:
-      data = try JSONEncoder().encode(value)
+      data = try JSONEncoder.default.encode(value)
     default:
       if JSONSerialization.isValidJSONObject(value) {
         data = try JSONSerialization.data(withJSONObject: value)
@@ -52,6 +67,17 @@ public struct FormData: Sendable {
         data = Data()
       }
     }
+
+    // no content type provided, try to extract it from the filename.
+    if contentType == nil, let filename {
+      contentType = FormData.mimeType(forPathExtension: (filename as NSString).pathExtension)
+    }
+
+    let headers = createHeaders(
+      name: name,
+      filename: filename,
+      contentType: contentType
+    )
 
     let bodyPart = BodyPart(headers: headers, data: data)
     bodyParts.append(bodyPart)
@@ -194,3 +220,46 @@ enum FormDataError: Error {
   case invalidEncoding
   case malformedContent
 }
+
+#if canImport(UniformTypeIdentifiers)
+  import UniformTypeIdentifiers
+
+  extension FormData {
+    /// Determines the MIME type based on the file extension.
+    /// Uses UniformTypeIdentifiers if available, otherwise falls back to CoreServices or MobileCoreServices.
+    package static func mimeType(forPathExtension pathExtension: String) -> String {
+      if #available(iOS 14, macOS 11, tvOS 14, watchOS 7, visionOS 1, *) {
+        return UTType(filenameExtension: pathExtension)?.preferredMIMEType
+          ?? "application/octet-stream"
+      } else {
+        if let id = UTTypeCreatePreferredIdentifierForTag(
+          kUTTagClassFilenameExtension, pathExtension as CFString, nil)?.takeRetainedValue(),
+          let contentType = UTTypeCopyPreferredTagWithClass(id, kUTTagClassMIMEType)?
+            .takeRetainedValue()
+        {
+          return contentType as String
+        }
+
+        return "application/octet-stream"
+      }
+    }
+  }
+#else
+  extension FormData {
+    /// Determines the MIME type based on the file extension.
+    /// Uses UniformTypeIdentifiers if available, otherwise falls back to CoreServices or MobileCoreServices.
+    package static func mimeType(forPathExtension pathExtension: String) -> String {
+      #if canImport(CoreServices) || canImport(MobileCoreServices)
+        if let id = UTTypeCreatePreferredIdentifierForTag(
+          kUTTagClassFilenameExtension, pathExtension as CFString, nil)?.takeRetainedValue(),
+          let contentType = UTTypeCopyPreferredTagWithClass(id, kUTTagClassMIMEType)?
+            .takeRetainedValue()
+        {
+          return contentType as String
+        }
+      #endif
+
+      return "application/octet-stream"
+    }
+  }
+#endif

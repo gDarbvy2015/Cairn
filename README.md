@@ -2,7 +2,7 @@
 [![codecov](https://codecov.io/gh/grdsdev/swift-http/graph/badge.svg?token=E4i22yGg9o)](https://codecov.io/gh/grdsdev/swift-http)
 
 The `HTTP` package provides a Swift interface for making HTTP requests and
-processing responses.
+processing responses. It is designed to be simple and intuitive, allowing developers to easily integrate HTTP functionality into their Swift applications.
 
 ## Features
 
@@ -17,13 +17,23 @@ processing responses.
 
 ## Installation
 
-Add the following line to your `Package.swift` file:
+To integrate the `HTTP` package into your Swift project, add the following line to your `Package.swift` file:
 
 ```swift
 .package(url: "https://github.com/grdsdev/swift-http.git", from: "0.0.1")
 ```
 
-Then, add "HTTP" to your target dependencies.
+Then, include "HTTP" in your target dependencies:
+
+```swift
+.target(
+  name: "YourTargetName", 
+  dependencies: [
+    .product(name: "HTTP", package: "swift-http"), 
+    .product(name: "HTTPFoundation", package: "swift-http"),
+  ]
+)
+```
 
 ## Usage
 

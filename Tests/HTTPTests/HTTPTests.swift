@@ -170,4 +170,19 @@ struct HTTPTests {
     }
     #expect(result.count == 20)
   }
+
+  @Test func requestWithURL() async throws {
+    struct ExpectedPayload: Decodable {
+      let headers: [String: String]
+    }
+
+    let fileURL = URL(fileURLWithPath: #filePath)
+      .deletingLastPathComponent()
+      .appendingPathComponent("file.txt")
+
+    let response = try await http.post("https://httpbin.org/anything", body: fileURL)
+    let payload = try await response.decode(as: ExpectedPayload.self)
+
+    #expect(payload.headers["Content-Type"] == "text/plain")
+  }
 }

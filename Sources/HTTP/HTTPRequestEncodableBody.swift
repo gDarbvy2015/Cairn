@@ -23,7 +23,7 @@ public protocol HTTPRequestEncodableBody: Encodable, Sendable {
 
 extension HTTPRequestEncodableBody {
   public static var encoder: JSONEncoder {
-    JSONEncoder()
+    JSONEncoder.default
   }
 }
 
