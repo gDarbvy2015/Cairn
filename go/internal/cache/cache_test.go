@@ -116,3 +116,10 @@ func TestStoreRestoreVerify(t *testing.T) {
 	// Remove output and restore it.
 	if err := os.Remove(filepath.Join(work, "out.txt")); err != nil {
 		t.Fatal(err)
+	}
+	loaded, err := store.GetManifest(key)
+	if err != nil || loaded == nil {
+		t.Fatalf("GetManifest: %v (nil=%v)", err, loaded == nil)
+	}
+	n, err := store.RestoreOutputs(work, loaded)
+	if err != nil || n != 1 {
