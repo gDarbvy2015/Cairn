@@ -5,7 +5,6 @@
 //  Created by Guilherme Souza on 08/01/25.
 //
 
-import ConcurrencyExtras
 import HTTPTypes
 
 #if canImport(FoundationNetworking)
@@ -55,13 +54,13 @@ public struct Response: Sendable {
     await String(decoding: body.collect(), as: UTF8.self)
   }
 
-  /// Lock used for synchronizing access to \_decoder.
-  private static let _decoder = LockIsolated(JSONDecoder())
+  nonisolated(unsafe) private static var _decoder = JSONDecoder()
+  private static let lock = NSLock()
 
   /// The default decoder instance used in ``decode(as:decoder:)`` method.
   public static var decoder: JSONDecoder {
-    get { _decoder.value }
-    set { _decoder.setValue(newValue) }
+    get { lock.withLock { _decoder } }
+    set { lock.withLock { _decoder = newValue } }
   }
 
   /// Decodes the response body to a specified type.
