@@ -110,8 +110,6 @@ public struct Response: Sendable {
     let stream: AsyncStream<Data>
     let continuation: AsyncStream<Data>.Continuation
 
-    private let data = LockIsolated<Data?>(nil)
-
     package init() {
       (stream, continuation) = AsyncStream.makeStream()
     }
@@ -123,20 +121,14 @@ public struct Response: Sendable {
     /// Collects the response body as a ``Data``.
     /// - Returns: The response body as ``Data``.
     public func collect() async -> Data {
-      if let data = data.value {
-        return data
-      }
-
-      let data = await stream.reduce(into: Data()) { $0 += $1 }
-      self.data.setValue(data)
-      return data
+      await stream.reduce(into: Data()) { $0 += $1 }
     }
 
-    package func append(_ data: Data) {
+    package func yield(_ data: Data) {
       continuation.yield(data)
     }
 
-    package func finalize() {
+    package func finish() {
       continuation.finish()
     }
   }
@@ -149,8 +141,8 @@ extension Response.Body {
   /// - Returns: A new ``Body`` instance with the given string.
   public static func string(_ string: String) -> Self {
     let body = Self()
-    body.append(string.data(using: .utf8)!)
-    body.finalize()
+    body.yield(string.data(using: .utf8)!)
+    body.finish()
     return body
   }
 
@@ -160,8 +152,8 @@ extension Response.Body {
   /// - Returns: A new ``Body`` instance with the given data.
   public static func data(_ data: Data) -> Self {
     let body = Self()
-    body.append(data)
-    body.finalize()
+    body.yield(data)
+    body.finish()
     return body
   }
 

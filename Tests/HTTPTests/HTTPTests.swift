@@ -185,4 +185,8 @@ struct HTTPTests {
 
     #expect(payload.headers["Content-Type"] == "text/plain")
   }
+
+  @Test func download() async throws {
+    
+  }
 }

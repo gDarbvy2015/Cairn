@@ -2,7 +2,7 @@ import Foundation
 @_exported import HTTPTypes
 @_exported import HTTPTypesFoundation
 
-/// A type for making HTTP requests with an intuitive API inspired by the web Fetch API.
+/// A type for making HTTP requests with an intuitive API.
 public protocol HTTPClient: Sendable {
   @discardableResult
   func send(_ request: HTTPRequest, body: Any?) async throws -> Response

@@ -128,7 +128,7 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
     switch handler {
     case let handler as DataTaskHandler:
       let body = handler.body ?? .init()
-      body.finalize()
+      body.finish()
 
       if let response = task.response as? HTTPURLResponse, let httpResponse = response.httpResponse,
         error == nil
@@ -149,8 +149,8 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
         do {
           #warning("TODO: loading whole file into memory is not ideal, find a better solution")
           let body = Response.Body()
-          body.append(try Data(contentsOf: location))
-          body.finalize()
+          body.yield(try Data(contentsOf: location))
+          body.finish()
 
           let response = Response(
             httpResponse: httpResponse,
@@ -318,7 +318,7 @@ final class DataLoader: NSObject, URLSessionDataDelegate, URLSessionDownloadDele
     if handler.body == nil {
       handler.body = .init()
     }
-    handler.body!.append(data)
+    handler.body!.yield(data)
   }
 
   #if !os(Linux)
