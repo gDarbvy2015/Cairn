@@ -2,7 +2,6 @@ import Foundation
 @_exported import HTTP
 import HTTPTypes
 import HTTPTypesFoundation
-import IssueReporting
 
 #if canImport(FoundationNetworking)
   import FoundationNetworking
@@ -110,11 +109,7 @@ public struct URLSessionHTTPClient: HTTPClient {
           return try await dataLoader.startUploadTask(
             task, session: session, delegate: nil)
         } else {
-          reportIssue("Malformed request")
-          return Response(
-            httpResponse: HTTPResponse(status: .badRequest),
-            body: .data(Data())
-          )
+          fatalError("Malformed request")
         }
       }
     } else {
@@ -185,8 +180,7 @@ public struct URLSessionHTTPClient: HTTPClient {
         }
         return try JSONSerialization.data(withJSONObject: value)
       } else {
-        reportIssue("Unsupported body type: \(type(of: value))")
-        return nil
+        fatalError("Unsupported body type: \(type(of: value))")
       }
     }
   }

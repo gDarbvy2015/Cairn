@@ -198,7 +198,7 @@ import Testing
 
     let fileURL = URL(fileURLWithPath: #filePath)
       .deletingLastPathComponent()
-      .appendingPathComponent("file.txt")
+      .appendingPathComponent("Fixtures/file.txt")
     try formData.append("file", fileURL)
 
     let string = String(decoding: formData.encode(), as: UTF8.self)

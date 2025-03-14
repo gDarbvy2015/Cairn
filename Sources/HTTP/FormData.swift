@@ -1,5 +1,4 @@
 import Foundation
-import IssueReporting
 
 /// A structure for creating and encoding multipart/form-data content.
 /// This is commonly used for file uploads and complex form submissions in HTTP requests.
@@ -63,8 +62,7 @@ public struct FormData: Sendable {
       if JSONSerialization.isValidJSONObject(value) {
         data = try JSONSerialization.data(withJSONObject: value)
       } else {
-        reportIssue("Unsupported value type for form data: \(type(of: value))")
-        data = Data()
+        fatalError("Unsupported value type for form data: \(type(of: value))")
       }
     }
 
