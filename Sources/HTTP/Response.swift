@@ -54,8 +54,13 @@ public struct Response: Sendable {
     await String(decoding: body.collect(), as: UTF8.self)
   }
 
-  nonisolated(unsafe) private static var _decoder = JSONDecoder()
   private static let lock = NSLock()
+
+  #if compiler(>=6)
+    nonisolated(unsafe) private static var _decoder = JSONDecoder()
+  #else
+    private static var _decoder = JSONDecoder()
+  #endif
 
   /// The default decoder instance used in ``decode(as:decoder:)`` method.
   public static var decoder: JSONDecoder {
