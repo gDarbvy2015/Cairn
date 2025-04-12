@@ -123,3 +123,10 @@ func TestStoreRestoreVerify(t *testing.T) {
 	}
 	n, err := store.RestoreOutputs(work, loaded)
 	if err != nil || n != 1 {
+		t.Fatalf("RestoreOutputs: n=%d err=%v", n, err)
+	}
+	got, err := os.ReadFile(filepath.Join(work, "out.txt"))
+	if err != nil || string(got) != "result-bytes" {
+		t.Fatalf("restored content wrong: %q err=%v", got, err)
+	}
+
