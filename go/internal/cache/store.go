@@ -182,3 +182,13 @@ func (s *Store) VerifyManifest(m *Manifest) VerifyReport {
 		if err != nil {
 			r.Missing = append(r.Missing, o.Digest)
 			continue
+		}
+		if HashBytes(content) == o.Digest {
+			r.OK++
+		} else {
+			r.Corrupt = append(r.Corrupt, o.Digest)
+		}
+	}
+	r.KeyMatches = ComputeKey(m.Inputs, m.Command) == m.Key
+	return r
+}
