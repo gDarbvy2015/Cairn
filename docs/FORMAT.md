@@ -123,3 +123,10 @@ Relative to the cache root (default `.cairn-cache`):
 ## 5. Verification
 
 Verifying a key means:
+
+1. Every output blob referenced by the manifest exists.
+2. Each blob re-hashes to its recorded digest (detects accidental corruption).
+3. Recomputing the key (§2) from the manifest's inputs and command equals the
+   stored `key` (detects manifest tampering with the index).
+
+A cache is *healthy* for a key when all three hold.
