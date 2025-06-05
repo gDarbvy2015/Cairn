@@ -86,3 +86,10 @@ insignificant whitespace) with keys in the fixed order below.
     {"path": "main.o", "digest": "85944171f73967e8", "size": 456}
   ]
 }
+```
+
+Field semantics:
+
+| Field      | Type              | Meaning                                              |
+| ---------- | ----------------- | ---------------------------------------------------- |
+| `version`  | unsigned integer  | Format version; currently `1`.                       |
