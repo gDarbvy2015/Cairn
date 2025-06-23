@@ -56,3 +56,6 @@
 
   <!-- ledger panel -->
   <rect x="540" y="20" width="260" height="360" rx="8" fill="#f4ede0" stroke="#c68a2e"/>
+  <rect x="540" y="20" width="260" height="30" rx="8" fill="#d9a441"/>
+  <text x="670" y="40" text-anchor="middle" class="head" fill="#3f2f10">PERFORMANCE LEDGER</text>
+
