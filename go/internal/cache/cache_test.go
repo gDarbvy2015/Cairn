@@ -130,3 +130,10 @@ func TestStoreRestoreVerify(t *testing.T) {
 		t.Fatalf("restored content wrong: %q err=%v", got, err)
 	}
 
+	report := store.VerifyManifest(loaded)
+	if !report.Healthy() {
+		t.Fatalf("verify not healthy: %+v", report)
+	}
+}
+
+const producerTag = "cairn-go"
