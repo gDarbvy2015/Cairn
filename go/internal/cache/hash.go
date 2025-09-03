@@ -46,3 +46,8 @@ func (h *Hasher) Sum() uint64 { return h.state }
 func (h *Hasher) Hex() string { return fmt.Sprintf("%016x", h.state) }
 
 // HashBytes hashes a byte slice and returns the canonical hex digest.
+func HashBytes(b []byte) string {
+	h := NewHasher()
+	h.Update(b)
+	return h.Hex()
+}
