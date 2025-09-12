@@ -20,3 +20,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Shared format v1** — FNV-1a 64-bit content hashing, canonical cache-key
   stream, and canonical manifest JSON, documented in `docs/FORMAT.md` and
   reproduced byte-for-byte by both tools.
+- Cross-language reference-vector tests guarding digest and key parity.
+- Demo scripts (`examples/demo.sh`, `examples/demo.ps1`), Makefile, and GitHub
