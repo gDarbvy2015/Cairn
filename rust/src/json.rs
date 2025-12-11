@@ -388,3 +388,26 @@ mod tests {
                 "items",
                 Json::Array(vec![Json::Str("a".into()), Json::Str("b".into())]),
             ),
+        ]);
+        let text = v.encode();
+        assert_eq!(
+            text,
+            r#"{"name":"cairn","count":3,"ok":true,"items":["a","b"]}"#
+        );
+        let parsed = parse(&text).unwrap();
+        assert_eq!(parsed, v);
+    }
+
+    #[test]
+    fn escapes() {
+        let v = Json::Str("line1\nline2\t\"quote\"".into());
+        let text = v.encode();
+        let parsed = parse(&text).unwrap();
+        assert_eq!(parsed, v);
+    }
+
+    #[test]
+    fn rejects_trailing() {
+        assert!(parse("{}garbage").is_err());
+    }
+}
