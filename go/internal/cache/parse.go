@@ -41,3 +41,6 @@ func ParseManifest(data []byte) (*Manifest, error) {
 		Outputs:  convertEntries(w.Outputs),
 	}
 	if m.Command == nil {
+		m.Command = []string{}
+	}
+	return m, nil
