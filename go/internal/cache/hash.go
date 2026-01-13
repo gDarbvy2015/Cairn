@@ -73,3 +73,8 @@ func HashFile(path string) (string, uint64, error) {
 			break
 		}
 		if err != nil {
+			return "", 0, err
+		}
+	}
+	return h.Hex(), total, nil
+}
