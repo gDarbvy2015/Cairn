@@ -299,3 +299,18 @@ mod tests {
             command,
             inputs,
             outputs,
+        };
+        store.put_manifest(&manifest).unwrap();
+
+        // Delete the output, then restore it from cache.
+        fs::remove_file(work.join("out.txt")).unwrap();
+        let loaded = store.get_manifest(&key).unwrap().unwrap();
+        let n = store.restore_outputs(&work, &loaded).unwrap();
+        assert_eq!(n, 1);
+        assert_eq!(fs::read(work.join("out.txt")).unwrap(), b"result-bytes");
+
+        let report = store.verify_manifest(&loaded).unwrap();
+        assert!(report.is_healthy(), "report: {report:?}");
+        fs::remove_dir_all(&dir).ok();
+    }
+}
