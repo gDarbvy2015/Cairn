@@ -134,3 +134,11 @@ func writeJSONString(b *strings.Builder, s string) {
 			b.WriteString("\\\"")
 		case '\\':
 			b.WriteString("\\\\")
+		case '\n':
+			b.WriteString("\\n")
+		case '\r':
+			b.WriteString("\\r")
+		case '\t':
+			b.WriteString("\\t")
+		default:
+			if r < 0x20 {
