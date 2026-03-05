@@ -386,3 +386,24 @@ cairn-run [--cache-dir DIR] [--base-dir DIR] \
 cairn-run hash <file>...     # standalone, prints digests
 cairn-run version            # standalone, prints version + format version
 ```
+
+On a hit the declared outputs are restored and the command is skipped; on a
+miss the command runs, outputs are captured, and a manifest is written. Failed
+commands are never cached. `--verbose` narrates every cache decision on stderr.
+
+## Roadmap — unexplored seams
+
+Directions, not promises — the current release excludes them:
+
+- **Store maintenance** — `gc`/prune pass for unreferenced blobs; size/age caps.
+- **Concurrency-safe writes** — advisory locking so parallel builds share safely.
+- **Richer output declaration** — glob or directory outputs.
+- **Remote seams** — optional shared/remote store for a team or CI fleet.
+
+Each would extend the format and bump `version` rather than silently changing
+the contract.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Normative format spec:
+[`docs/FORMAT.md`](docs/FORMAT.md). Change history: [`CHANGELOG.md`](CHANGELOG.md).
