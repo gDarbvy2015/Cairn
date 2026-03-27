@@ -26,3 +26,5 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Notes
 
+- The hash is intentionally **non-cryptographic**; Cairn is a build cache, not
+  a security boundary. See `docs/FORMAT.md` for the rationale.
