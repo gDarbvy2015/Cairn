@@ -108,3 +108,10 @@ other control characters (`< 0x20`) use lowercase `\uXXXX`.
 ## 4. On-disk layout
 
 Relative to the cache root (default `.cairn-cache`):
+
+```
+<root>/
+  objects/<aa>/<digest>       content blob; <aa> = first two hex chars of digest
+  manifests/<key>.json        canonical manifest, one file per key
+```
+
