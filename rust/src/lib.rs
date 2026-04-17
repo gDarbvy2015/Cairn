@@ -17,3 +17,4 @@ pub mod json;
 pub mod manifest;
 pub mod store;
 
+pub use hash::{hash_bytes, Hasher};
