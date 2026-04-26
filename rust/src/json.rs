@@ -365,3 +365,26 @@ fn utf8_len(lead: u8) -> usize {
 }
 
 /// Helper to build an object from owned pairs while preserving order.
+pub fn object(pairs: Vec<(&str, Json)>) -> Json {
+    Json::Object(pairs.into_iter().map(|(k, v)| (k.to_string(), v)).collect())
+}
+
+/// Sort a set of (key, value) string pairs deterministically for hashing.
+pub fn sorted_map(map: BTreeMap<String, String>) -> Json {
+    Json::Object(map.into_iter().map(|(k, v)| (k, Json::Str(v))).collect())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn roundtrip_object() {
+        let v = object(vec![
+            ("name", Json::Str("cairn".into())),
+            ("count", Json::Uint(3)),
+            ("ok", Json::Bool(true)),
+            (
+                "items",
+                Json::Array(vec![Json::Str("a".into()), Json::Str("b".into())]),
+            ),
