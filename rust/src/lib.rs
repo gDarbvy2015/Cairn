@@ -18,3 +18,5 @@ pub mod manifest;
 pub mod store;
 
 pub use hash::{hash_bytes, Hasher};
+pub use manifest::{InputEntry, Manifest, OutputEntry, FORMAT_VERSION};
+pub use store::{Store, VerifyReport};
