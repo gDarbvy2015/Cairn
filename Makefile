@@ -45,3 +45,6 @@ vet: ## Static checks
 demo: build ## Run the end-to-end demo
 	./examples/demo.sh
 
+clean: ## Remove build artifacts and caches
+	cd rust && cargo clean
+	rm -rf bin .cairn-cache
