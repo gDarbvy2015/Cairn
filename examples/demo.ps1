@@ -44,3 +44,5 @@ try {
     & $cairn show --key $key
 
     Write-Host "`n==> Demo complete."
+}
+finally {
