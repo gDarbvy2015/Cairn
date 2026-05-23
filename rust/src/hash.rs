@@ -88,3 +88,8 @@ mod tests {
     #[test]
     fn streaming_matches_oneshot() {
         let mut h = Hasher::new();
+        h.update(b"foo");
+        h.update(b"bar");
+        assert_eq!(h.finalize_hex(), hash_bytes(b"foobar"));
+    }
+}
