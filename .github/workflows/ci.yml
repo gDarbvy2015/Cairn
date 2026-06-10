@@ -57,3 +57,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - uses: actions/setup-go@v5
         with:
+          go-version: '1.24'
+      - name: Build both tools
+        run: |
+          cd rust && cargo build --release && cd ..
