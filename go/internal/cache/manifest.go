@@ -142,3 +142,11 @@ func writeJSONString(b *strings.Builder, s string) {
 			b.WriteString("\\t")
 		default:
 			if r < 0x20 {
+				fmt.Fprintf(b, "\\u%04x", r)
+			} else {
+				b.WriteRune(r)
+			}
+		}
+	}
+	b.WriteByte('"')
+}
