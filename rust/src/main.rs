@@ -271,3 +271,18 @@ USAGE:\n\
 \n\
 COMMANDS:\n\
     hash <file>...                       Print content digests of files\n\
+    key    --input F... [-- cmd...]      Compute a cache key from inputs\n\
+    store  --input F... --output F... [--key K] [-- cmd...]\n\
+                                         Store outputs and write a manifest\n\
+    restore --key K [--out-dir DIR]      Restore outputs from cache\n\
+    verify  --key K                      Verify store integrity for a key\n\
+    show    --key K                      Print a manifest as JSON\n\
+    version                              Print version\n\
+\n\
+GLOBAL OPTIONS:\n\
+    --cache-dir DIR   Cache root (default: {DEFAULT_CACHE})\n\
+    --base-dir  DIR   Base directory for --input/--output (default: .)\n\
+    --                Everything after is treated as the command\n",
+        env!("CARGO_PKG_VERSION")
+    );
+}
