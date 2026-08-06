@@ -69,3 +69,7 @@ func HashFile(path string) (string, uint64, error) {
 			h.Update(buf[:n])
 			total += uint64(n)
 		}
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
