@@ -192,3 +192,13 @@ func (s *Store) VerifyManifest(m *Manifest) VerifyReport {
 	r.KeyMatches = ComputeKey(m.Inputs, m.Command) == m.Key
 	return r
 }
+
+// atomicWrite writes to a temp file and renames into place.
+func atomicWrite(dest string, content []byte) error {
+	tmp := dest + ".tmp"
+	f, err := os.Create(tmp)
+	if err != nil {
+		return err
+	}
+	if _, err := f.Write(content); err != nil {
+		f.Close()
