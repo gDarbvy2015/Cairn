@@ -83,3 +83,8 @@ mod tests {
         assert_eq!(hash_bytes(b"a"), "af63dc4c8601ec8c");
         // "foobar" is a classic FNV reference vector.
         assert_eq!(hash_bytes(b"foobar"), "85944171f73967e8");
+    }
+
+    #[test]
+    fn streaming_matches_oneshot() {
+        let mut h = Hasher::new();
