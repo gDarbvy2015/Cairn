@@ -42,3 +42,6 @@ vet: ## Static checks
 	cd rust && cargo clippy --all-targets -- -D warnings || true
 	cd go && go vet ./...
 
+demo: build ## Run the end-to-end demo
+	./examples/demo.sh
+
