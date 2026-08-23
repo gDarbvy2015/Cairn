@@ -44,3 +44,6 @@ func ParseManifest(data []byte) (*Manifest, error) {
 		m.Command = []string{}
 	}
 	return m, nil
+}
+
+func convertEntries(in []wireEntry) []Entry {
