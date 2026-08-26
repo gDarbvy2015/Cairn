@@ -86,3 +86,8 @@
 
     <rect x="0" y="324" width="880" height="96" fill="url(#rock4)"/>
     <text x="28" y="356" class="lbl" fill="#c9ced4">FNV-1a offset basis: cbf29ce484222325</text>
+    <text x="28" y="378" class="sub" fill="#8b9099">deterministic · dependency-free · non-cryptographic</text>
+  </g>
+
+  <!-- seam ties: manifest references blobs -->
+  <g stroke="#8fd0e8" stroke-width="1.4" fill="none" opacity=".8" stroke-dasharray="3 4">
