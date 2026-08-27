@@ -66,3 +66,6 @@
   <text x="560" y="120" fill="#9c6318" font-size="13">MISS · run cmd</text>
   <rect x="560" y="128" width="220" height="14" rx="2" fill="#e0975a" class="bar1"/>
 
+  <text x="560" y="176" fill="#2f6b4a" font-size="13">HIT · restore</text>
+  <rect x="560" y="184" width="220" height="14" rx="2" fill="#7fc9a0" class="bar2"/>
+
