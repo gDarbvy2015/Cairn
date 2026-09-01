@@ -258,3 +258,15 @@ USAGE:
     cairn-run version
 
 OPTIONS:
+    --cache-dir DIR   Cache root (default: %s)
+    --base-dir  DIR   Base directory for inputs/outputs (default: .)
+    --input     F     Declare an input file (repeatable)
+    --output    F     Declare an output file (repeatable)
+    --force           Always run the command; still records the manifest
+    --verbose         Print cache decisions to stderr
+
+On a cache hit the declared outputs are restored and the command is skipped.
+On a miss the command runs, outputs are captured, and a manifest is written
+in a format compatible with the Rust 'cairn' engine.
+`, version, defaultCache)
+}
