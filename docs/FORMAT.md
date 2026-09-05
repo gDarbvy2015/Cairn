@@ -130,3 +130,11 @@ Verifying a key means:
    stored `key` (detects manifest tampering with the index).
 
 A cache is *healthy* for a key when all three hold.
+
+## 6. Compatibility guarantees
+
+- The two implementations produce **byte-identical** manifests for the same
+  logical entry.
+- Either tool can restore and verify a manifest written by the other.
+- New format versions bump `version`; readers should reject versions they do
+  not understand.
