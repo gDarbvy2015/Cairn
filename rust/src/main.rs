@@ -257,3 +257,17 @@ fn cmd_show(args: &[String]) -> Result<ExitCode, String> {
         }
         None => {
             eprintln!("cairn: no manifest for key {key}");
+            Ok(ExitCode::from(2))
+        }
+    }
+}
+
+fn print_usage() {
+    eprintln!(
+        "cairn {} — content-addressed build cache\n\
+\n\
+USAGE:\n\
+    cairn <command> [options]\n\
+\n\
+COMMANDS:\n\
+    hash <file>...                       Print content digests of files\n\
