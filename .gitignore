@@ -16,3 +16,4 @@ Cargo.lock
 # Editor / OS
 .vscode/
 .idea/
+.DS_Store
