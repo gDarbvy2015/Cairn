@@ -202,3 +202,14 @@ func atomicWrite(dest string, content []byte) error {
 	}
 	if _, err := f.Write(content); err != nil {
 		f.Close()
+		return err
+	}
+	if err := f.Sync(); err != nil {
+		f.Close()
+		return err
+	}
+	if err := f.Close(); err != nil {
+		return err
+	}
+	return os.Rename(tmp, dest)
+}
