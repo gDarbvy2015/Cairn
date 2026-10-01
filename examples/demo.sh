@@ -56,3 +56,7 @@ rm -f output.txt
 "$cairn" restore --key "$key" --out-dir .
 "$cairn" verify --key "$key"
 echo "manifest:"
+"$cairn" show --key "$key"
+
+echo
+echo "==> Demo complete."
