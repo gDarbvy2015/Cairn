@@ -50,3 +50,6 @@ func convertEntries(in []wireEntry) []Entry {
 	out := make([]Entry, len(in))
 	for i, e := range in {
 		out[i] = Entry{Path: e.Path, Digest: e.Digest, Size: e.Size}
+	}
+	return out
+}
