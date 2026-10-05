@@ -69,3 +69,6 @@
   <text x="560" y="176" fill="#2f6b4a" font-size="13">HIT · restore</text>
   <rect x="560" y="184" width="220" height="14" rx="2" fill="#7fc9a0" class="bar2"/>
 
+  <line x1="560" y1="230" x2="780" y2="230" stroke="#c68a2e" stroke-width="1"/>
+  <text x="560" y="256" fill="#3f2f10" font-size="12">Bars show shape, not</text>
+  <text x="560" y="274" fill="#3f2f10" font-size="12">numbers. Measure your</text>
