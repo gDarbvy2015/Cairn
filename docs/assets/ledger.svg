@@ -72,3 +72,7 @@
   <line x1="560" y1="230" x2="780" y2="230" stroke="#c68a2e" stroke-width="1"/>
   <text x="560" y="256" fill="#3f2f10" font-size="12">Bars show shape, not</text>
   <text x="560" y="274" fill="#3f2f10" font-size="12">numbers. Measure your</text>
+  <text x="560" y="292" fill="#3f2f10" font-size="12">own workload, see</text>
+  <text x="560" y="310" fill="#3f2f10" font-size="12">the ledger section.</text>
+  <text x="560" y="350" fill="#8a5a16" font-size="11">FNV-1a · non-cryptographic</text>
+</svg>
