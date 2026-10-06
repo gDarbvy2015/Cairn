@@ -46,3 +46,6 @@ try {
     Write-Host "`n==> Demo complete."
 }
 finally {
+    Pop-Location
+    Remove-Item -Recurse -Force $work
+}
