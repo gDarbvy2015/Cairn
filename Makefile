@@ -45,6 +45,9 @@ vet: ## Static checks
 demo: build ## Run the end-to-end demo
 	./examples/demo.sh
 
+check: vet test ## Run the same checks CI runs, without mutating the tree
+	@echo "check: vet + test green"
+
 clean: ## Remove build artifacts and caches
 	cd rust && cargo clean
 	rm -rf bin .cairn-cache
