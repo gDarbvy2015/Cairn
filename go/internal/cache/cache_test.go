@@ -137,3 +137,25 @@ func TestStoreRestoreVerify(t *testing.T) {
 }
 
 const producerTag = "cairn-go"
+
+// Streaming in odd-sized chunks must equal the one-shot digest for a larger payload.
+func TestStreamingChunkEquivalence(t *testing.T) {
+	filler := make([]byte, 1000)
+	for i := range filler {
+		filler[i] = byte((i*31 + 7) % 251)
+	}
+	want := HashBytes(filler)
+	for _, chunk := range []int{1, 3, 7, 64, 333, 999} {
+		h := NewHasher()
+		for off := 0; off < len(filler); off += chunk {
+			end := off + chunk
+			if end > len(filler) {
+				end = len(filler)
+			}
+			h.Update(filler[off:end])
+		}
+		if got := h.Hex(); got != want {
+			t.Errorf("chunk %d: streaming digest %s != one-shot %s", chunk, got, want)
+		}
+	}
+}
