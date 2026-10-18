@@ -138,3 +138,15 @@ A cache is *healthy* for a key when all three hold.
 - Either tool can restore and verify a manifest written by the other.
 - New format versions bump `version`; readers should reject versions they do
   not understand.
+
+
+## FAQ
+
+**Why FNV-1a and not a cryptographic hash?** The key only needs to be deterministic and
+cheap to recompute; it is not a security boundary for a local store. For shared stores,
+verify the manifest on restore instead of trusting the key alone (the Go package header
+carries the same note).
+
+**Can the two engines disagree on a key?** Not for the same normalized inputs: both sides
+pin the identical vectors and assert the canonical manifest JSON byte-for-byte, so a drift
+fails those tests before any store is shared.
